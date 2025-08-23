@@ -11,6 +11,7 @@ import PencilKit
 class DrawingViewModel: ObservableObject {
     @Published var isAnalyzing = false//분석 중인지 여부
     @Published var drawing = PKDrawing()
+    @Published var analysisResult: DrawingAnalysisModel?//분석 완료 후 데이터
     
     func analyzeDrawing(completion: @escaping (Bool) -> Void) {
         guard let image = drawing.asImage(size: UIScreen.main.bounds.size),
@@ -38,11 +39,13 @@ class DrawingViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self?.isAnalyzing = false
                 switch result {
-                case .success:
+                case .success(let dto):
                     print("Image analysis request sent successfully")
+                    self?.analysisResult = DrawingAnalysisModel(from: dto)
                     completion(true)
                 case .failure(let error):
                     print("Image analysis failed: \(error)")
+                    self?.analysisResult = nil
                     completion(false)
                 }
             }
