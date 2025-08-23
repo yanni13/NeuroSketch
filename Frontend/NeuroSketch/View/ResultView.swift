@@ -7,19 +7,9 @@
 
 import SwiftUI
 
-struct Triangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-        path.closeSubpath()
-        return path
-    }
-}
-
 struct ResultView: View {
     @State private var showSuccessPopUp = false
+    @Binding var navigationPath: NavigationPath
     
     var body: some View {
         ZStack {
@@ -57,8 +47,10 @@ struct ResultView: View {
                     
                     CheckListButton(
                         text: "산책하기"
-                    ) {
-                        showSuccessPopUp = true
+                    ) { isCompleted in
+                        if isCompleted {
+                            showSuccessPopUp = true
+                        }
                     }
                 }
             }
@@ -78,6 +70,9 @@ struct ResultView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
+                    if !navigationPath.isEmpty {
+                        navigationPath.removeLast()
+                    }
                 }, label: {
                     Image(systemName: "chevron.left")
                         .foregroundStyle(.black)
@@ -86,6 +81,7 @@ struct ResultView: View {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
+                    navigationPath.removeLast(2)
                 }, label: {
                     Image(systemName: "house.fill")
                         .foregroundStyle(.black)
@@ -95,6 +91,14 @@ struct ResultView: View {
     }
 }
 
-#Preview {
-    ResultView()
+struct Triangle: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.closeSubpath()
+        return path
+    }
 }
+

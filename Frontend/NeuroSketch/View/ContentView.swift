@@ -9,12 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab = 0
-    @State private var navigationPath = NavigationPath()
+    @State private var path = NavigationPath()
     
     var body: some View {
         ZStack {
             TabView(selection: $selectedTab) {
-            NavigationStack(path: $navigationPath) {
+            NavigationStack(path: $path) {
                 VStack {
                     // 커스텀 헤더
                     HStack {
@@ -22,7 +22,7 @@ struct ContentView: View {
                             .font(.title3)
                         Spacer()
                         Button(action: {
-                            navigationPath.append("drawing")
+                            path.append("drawing")
                         }) {
                             Image(systemName: "square.and.pencil")
                                 .resizable()
@@ -49,6 +49,7 @@ struct ContentView: View {
                         .frame(width: 166, height: 144)
                     
                     Spacer()
+                    
                     VStack(alignment: .leading) {
                         Text("할 일")
                             .foregroundStyle(.black)
@@ -59,8 +60,8 @@ struct ContentView: View {
                         // 체크리스트 버튼
                         CheckListButton(
                             text: "생성전TodoList"
-                        ) {
-                            
+                        ) { isCompleted in
+                            // ContentView에서의 액션
                         }
                         .padding(.bottom, 65)
                     }
@@ -75,11 +76,13 @@ struct ContentView: View {
                 .navigationDestination(for: String.self) { route in
                     switch route {
                     case "drawing":
-                        DrawingView(navigationPath: $navigationPath)
+                        DrawingView(navigationPath: $path)
                     case "result":
-                        ResultView()
+                        ResultView(navigationPath: $path)
+                    case "mainView":
+                        ContentView()
                     default:
-                        EmptyView()
+                        ContentView()
                     }
                 }
             }
