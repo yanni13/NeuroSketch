@@ -47,7 +47,7 @@ struct ResultView: View {
                         .multilineTextAlignment(.leading)
                     
                     CheckListButton(
-                        text: "산책하기"
+                        text: "산책하기", isCompleted: false, showIcon: false
                     ) { isCompleted in
                         if isCompleted {
                             showSuccessPopUp = true
