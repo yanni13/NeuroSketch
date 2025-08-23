@@ -19,17 +19,16 @@ struct ResultView: View {
                     Image("SpeechBallon")
                         .resizable()
                         .frame(maxWidth: 300, maxHeight: 100)
-                        .shadow(radius: 10)
+                        .shadow(radius: 5)
                     
                     Text("응원 메시지")
                         .multilineTextAlignment(.center)
                         .offset(y: -10)
                 }
-                
-//
+                .offset(y: -70)
+
                 LottieComponent()
                     .frame(width: 166, height: 137)
-
                 
                 Spacer().frame(height: 40)
                 
@@ -69,12 +68,11 @@ struct ResultView: View {
         .navigationBarBackButtonHidden()
         .navigationTitle("분석결과")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    if !navigationPath.isEmpty {
-                        navigationPath.removeLast()
-                    }
+                    navigationPath = NavigationPath()
 
                 }, label: {
                     Image(systemName: "chevron.left")

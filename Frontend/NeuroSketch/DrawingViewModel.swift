@@ -10,8 +10,9 @@ import PencilKit
 
 class DrawingViewModel: ObservableObject {
     @Published var isAnalyzing = false//분석 중인지 여부
+    @Published var drawing = PKDrawing()
     
-    func analyzeDrawing(_ drawing: PKDrawing, completion: @escaping (Bool) -> Void) {
+    func analyzeDrawing(completion: @escaping (Bool) -> Void) {
         guard let image = drawing.asImage(size: UIScreen.main.bounds.size),
               let pngData = image.jpegData(compressionQuality: 0.8) else {
             print("Failed to convert drawing to JPEG data")
@@ -33,11 +34,9 @@ class DrawingViewModel: ObservableObject {
         
         print("[DrawingViewModel] - Image 분석 요청")
         
-        //TODO: 나중에 요청 예정(api 미완성)
         ImageService.shared.analyzeImage(request: request) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isAnalyzing = false
-                
                 switch result {
                 case .success:
                     print("Image analysis request sent successfully")
