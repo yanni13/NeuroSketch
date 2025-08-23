@@ -10,6 +10,7 @@ import SwiftUI
 struct ResultView: View {
     @State private var showSuccessPopUp = false
     @State private var showDetailView = false
+    @State private var isCompleted = false
     @Binding var navigationPath: NavigationPath
     
     var body: some View {
@@ -48,8 +49,12 @@ struct ResultView: View {
                         .multilineTextAlignment(.leading)
                     
                     CheckListButton(
-                        text: "산책하기", isCompleted: .constant(false), showIcon: false
+                        text: "산책하기", isCompleted: $isCompleted, showIcon: false
                     ) {
+                        isCompleted.toggle()
+                        if isCompleted {
+                            showSuccessPopUp = true
+                        }
                     }
                 }
             }
