@@ -9,12 +9,15 @@ import SwiftUI
 
 struct CheckListButton: View {
     let text: String
-    @State private var isCompleted = false
+    @State var isCompleted: Bool
+    let showIcon: Bool
     let action: (_ isCompleted: Bool) -> Void
     
     var body: some View {
         Button(action: {
-            isCompleted.toggle()
+            if !showIcon {
+                isCompleted.toggle()
+            }
             action(isCompleted)
         }) {
             ZStack(alignment: .leading) {
@@ -36,6 +39,16 @@ struct CheckListButton: View {
                     Text(text)
                         .multilineTextAlignment(.leading)
                         .foregroundStyle(isCompleted ? .white : Color("green02"))
+                    
+                    if showIcon{
+                        Spacer()
+                        
+                        Image(isCompleted ? .arrowRight : .arrowRightGreen)
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .aspectRatio(contentMode: .fit)
+                            .padding(.trailing, 28)
+                    }
                 }
                 .padding(.leading, 16)
             }
