@@ -56,6 +56,8 @@ struct DrawingView: View {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
+                    saveDrawingToPhotos()
+                    navigationPath.append("analysis")
                     
                     viewModel.analyzeDrawing(drawing) { success in
                         if success {
@@ -70,6 +72,7 @@ struct DrawingView: View {
             }
         }
         .navigationBarBackButtonHidden()
+        .toolbar(.hidden, for: .tabBar)
     }
 
     private func saveDrawingToPhotos() {
