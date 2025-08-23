@@ -12,7 +12,9 @@ struct ContentView: View {
     @State private var selectedTab = 0
     @State private var path = NavigationPath()
     @State private var showSuccessPopUp = false
+    @State private var isFirstTodoCompleted = false
     @StateObject private var drawingViewModel = DrawingViewModel()
+    @StateObject private var contentViewModel = ContentViewModel()
     @EnvironmentObject var appState: AppState
     
     var body: some View {
@@ -64,10 +66,17 @@ struct ContentView: View {
 
                             // 체크리스트 버튼
                             CheckListButton(
-                                text: "생성전TodoList", isCompleted: false, showIcon: false
+                                text: contentViewModel.pendingTodos.first?.activity ?? "분석 결과에 따라 할 일을 추천해드려요",
+                                isCompleted: $isFirstTodoCompleted,
+                                showIcon: false
                             ) { isCompleted in
-                                if isCompleted {
-                                    showSuccessPopUp = true
+                                if isCompleted, let firstTodo = contentViewModel.pendingTodos.first {
+                                    contentViewModel.completeTodo(todoId: firstTodo.id) { success in
+                                        if success {
+                                            showSuccessPopUp = true
+                                            isFirstTodoCompleted.toggle()
+                                        }
+                                    }
                                 }
                             }
                             .padding(.bottom, 65)
@@ -105,6 +114,10 @@ struct ContentView: View {
                     Text("홈")
                 }
                 .tag(0)
+                .onAppear{
+                    isFirstTodoCompleted = false
+                    contentViewModel.fetchTodoList()
+                }
 
                 archiveTapBar
                     .tabItem {
@@ -156,7 +169,7 @@ struct ContentView: View {
     private var archiveTapBar: some View{
         NavigationStack(path: $path) {
             // 커스텀 헤더
-            VStack{
+            ScrollView{
                 HStack {
                     Text("NeuroSketch")
                         .font(.title3)
@@ -177,20 +190,38 @@ struct ContentView: View {
                 .padding(.horizontal, 24)
                 
                 VStack(alignment: .leading, spacing: 40){
-                    VStack(alignment: .leading, spacing: 12){
-                        Text("할 일")
-                        
-                        CheckListButton(text: "산책하기", isCompleted: false, showIcon: true, action: { isCompleted in
-                            path.append("result")
-                        })
+                    if !contentViewModel.pendingTodos.isEmpty {
+                        VStack(alignment: .leading, spacing: 12){
+                            Text("할 일")
+                            
+                            ForEach(contentViewModel.pendingTodos, id: \.id) { todo in
+                                CheckListButton(
+                                    text: todo.activity,
+                                    isCompleted: .constant(false),
+                                    showIcon: true,
+                                    action: { isCompleted in
+                                        path.append("result")
+                                    }
+                                )
+                            }
+                        }
                     }
                     
-                    VStack(alignment: .leading, spacing: 12){
-                        Text("완료한 일")
-                        
-                        CheckListButton(text: "산책하기", isCompleted: true, showIcon: true, action: { isCompleted in
-                            path.append("result")
-                        })
+                    if !contentViewModel.completedTodos.isEmpty {
+                        VStack(alignment: .leading, spacing: 12){
+                            Text("완료한 일")
+                            
+                            ForEach(contentViewModel.completedTodos, id: \.id) { todo in
+                                CheckListButton(
+                                    text: todo.activity,
+                                    isCompleted: .constant(true),
+                                    showIcon: true,
+                                    action: { isCompleted in
+                                        path.append("result")
+                                    }
+                                )
+                            }
+                        }
                     }
                     
                     Spacer()
