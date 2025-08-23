@@ -70,7 +70,7 @@ struct ContentView: View {
                                 isCompleted: $isFirstTodoCompleted,
                                 showIcon: false
                             ) { isCompleted in
-                                if isCompleted, let firstTodo = contentViewModel.pendingTodos.first {
+                                if !isCompleted, let firstTodo = contentViewModel.pendingTodos.first {
                                     contentViewModel.completeTodo(todoId: firstTodo.id) { success in
                                         if success {
                                             showSuccessPopUp = true
@@ -94,13 +94,13 @@ struct ContentView: View {
                         case "drawing":
                             DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                         case "result":
-                            ResultView(navigationPath: $path)
+                            ResultView(navigationPath: $path, drawingViewModel: drawingViewModel)
                         case "mainView":
                             ContentView()
                         case "analysis":
                             ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
                         case "detailView":
-                            ResultDetailView(navigationPath: $path)
+                            ResultDetailView(navigationPath: $path, drawingViewModel: drawingViewModel)
                         default:
                             ContentView()
                         }
@@ -235,7 +235,7 @@ struct ContentView: View {
                 case "drawing":
                     DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                 case "result":
-                    ResultView(navigationPath: $path)
+                    ResultView(navigationPath: $path, drawingViewModel: drawingViewModel)
                 case "mainView":
                     ContentView()
                 case "analysis":

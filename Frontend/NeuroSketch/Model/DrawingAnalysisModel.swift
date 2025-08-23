@@ -173,7 +173,7 @@ extension DrawingAnalysisModel {
         self.imageAnalysis = ImageAnalysisModel(from: dto.imageAnalysis)
         self.psychologicalInterpretation = PsychologicalInterpretationModel(from: dto.psychologicalInterpretation)
         self.aiAdvice = dto.aiAdvice
-        self.recommendedActivities = dto.recommendedActivities
+        self.recommendedActivities = dto.recommendedActivities.map { $0.activity }
         self.nextDrawingThemeDescription = dto.nextDrawingThemeDescription
     }
 }

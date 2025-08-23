@@ -53,7 +53,7 @@ struct StatusIndicatorCard: View {
     
     var body: some View {
         StatusCard(title: "상태") {
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 Circle()
                     .frame(width: 8, height: 8)
                     .foregroundStyle(indicatorColor)
