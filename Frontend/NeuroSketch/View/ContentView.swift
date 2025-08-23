@@ -12,7 +12,9 @@ struct ContentView: View {
     @State private var selectedTab = 0
     @State private var path = NavigationPath()
     @State private var showSuccessPopUp = false
-
+    @StateObject private var drawingViewModel = DrawingViewModel()
+    @EnvironmentObject var appState: AppState
+    
     var body: some View {
         ZStack {
             TabView(selection: $selectedTab) {
@@ -62,7 +64,7 @@ struct ContentView: View {
 
                             // 체크리스트 버튼
                             CheckListButton(
-                                text: "생성전TodoList"
+                                text: "생성전TodoList", isCompleted: false, showIcon: false
                             ) { isCompleted in
                                 if isCompleted {
                                     showSuccessPopUp = true
@@ -81,13 +83,13 @@ struct ContentView: View {
                     .navigationDestination(for: String.self) { route in
                         switch route {
                         case "drawing":
-                            DrawingView(navigationPath: $path)
+                            DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                         case "result":
                             ResultView(navigationPath: $path)
                         case "mainView":
                             ContentView()
                         case "analysis":
-                            ImageAnalysisView(navigationPath: $path)
+                            ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
                         case "detailView":
                             ResultDetailView(navigationPath: $path)
                         default:
@@ -104,7 +106,7 @@ struct ContentView: View {
                 }
                 .tag(0)
 
-                Text("아카이브")
+                archiveTapBar
                     .tabItem {
                         Image(systemName: "tray")
                             .resizable()
@@ -144,8 +146,73 @@ struct ContentView: View {
                 )
             }
         }
-        .onAppear {
-            UserDefaults.standard.set(UUID().uuidString, forKey: "uid")
+        .onAppear{
+            if ((UserDefaults.standard.string(forKey: "uid")?.isEmpty) != nil) {
+                appState.isLoggedIn = true
+            }
+        }
+    }
+    
+    private var archiveTapBar: some View{
+        NavigationStack(path: $path) {
+            // 커스텀 헤더
+            VStack{
+                HStack {
+                    Text("NeuroSketch")
+                        .font(.title3)
+                    Spacer()
+                    Button(action: {
+                        path.append("drawing")
+                    }) {
+                        Image(systemName: "square.and.pencil")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(.black)
+                            .padding(4)
+                    }
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+                }
+                .padding(.top, 8)
+                .padding(.horizontal, 24)
+                
+                VStack(alignment: .leading, spacing: 40){
+                    VStack(alignment: .leading, spacing: 12){
+                        Text("할 일")
+                        
+                        CheckListButton(text: "산책하기", isCompleted: false, showIcon: true, action: { isCompleted in
+                            path.append("result")
+                        })
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 12){
+                        Text("완료한 일")
+                        
+                        CheckListButton(text: "산책하기", isCompleted: true, showIcon: true, action: { isCompleted in
+                            path.append("result")
+                        })
+                    }
+                    
+                    Spacer()
+                }
+                .padding(.top, 30)
+                .padding(.horizontal, 24)
+            }
+            .navigationBarHidden(true)
+            .navigationDestination(for: String.self) { route in
+                switch route {
+                case "drawing":
+                    DrawingView(viewModel: drawingViewModel, navigationPath: $path)
+                case "result":
+                    ResultView(navigationPath: $path)
+                case "mainView":
+                    ContentView()
+                case "analysis":
+                    ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
+                default:
+                    ContentView()
+                }
+            }
         }
     }
 }
