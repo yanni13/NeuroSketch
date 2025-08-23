@@ -3,6 +3,7 @@ package com.gtf.neuro_sketch.service;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gtf.neuro_sketch.model.ImageAnalysisResult;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class ImageAnalysisService {
     @Value("${openai.api.url}")
     private String apiUrl;
 
-    public String analyzeImage(MultipartFile imageFile) throws IOException {
+    public ImageAnalysisResult analyzeImage(MultipartFile imageFile) throws IOException {
         String analysisPrompt = buildAnalysisPrompt();
         String base64Image = Base64.getEncoder().encodeToString(imageFile.getBytes());
 
@@ -59,10 +60,16 @@ public class ImageAnalysisService {
                 .block();
         log.info("ChatGPT response: {}", response);
 
-        if (response != null) {
-            return response.getChoices().getFirst().getMessage().getContent();
+        if (response != null && !response.getChoices().isEmpty()) {
+            String jsonContent = response.getChoices().getFirst().getMessage().getContent();
+            try {
+                return objectMapper.readValue(jsonContent, ImageAnalysisResult.class);
+            } catch (Exception e) {
+                log.error("Failed to parse image analysis JSON response: {}", jsonContent, e);
+                return new ImageAnalysisResult(); // Return empty object if parsing fails
+            }
         }
-        return "";
+        return new ImageAnalysisResult();
     }
 
     private String buildAnalysisPrompt() {
