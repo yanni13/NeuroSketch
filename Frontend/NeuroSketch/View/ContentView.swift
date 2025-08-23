@@ -12,6 +12,7 @@ struct ContentView: View {
     @State private var selectedTab = 0
     @State private var path = NavigationPath()
     @State private var showSuccessPopUp = false
+    @EnvironmentObject var appState: AppState
     
     var body: some View {
         ZStack {
@@ -132,7 +133,9 @@ struct ContentView: View {
             }
         }
         .onAppear{
-            UserDefaults.standard.set(UUID().uuidString, forKey: "uid")
+            if ((UserDefaults.standard.string(forKey: "uid")?.isEmpty) != nil) {
+                appState.isLoggedIn = true
+            }
         }
     }
 }

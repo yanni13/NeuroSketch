@@ -19,6 +19,10 @@ class DrawingViewModel: ObservableObject {
             return
         }
         
+        if ((UserDefaults.standard.string(forKey: "uid")?.isEmpty) == nil) {
+            UserDefaults.standard.set(UUID().uuidString, forKey: "uid")
+        }
+        
         isAnalyzing = true
         
         let userId = UserDefaults.standard.string(forKey: "uid") ?? ""
