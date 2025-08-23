@@ -12,7 +12,9 @@ struct ContentView: View {
     @State private var selectedTab = 0
     @State private var path = NavigationPath()
     @State private var showSuccessPopUp = false
-
+    @StateObject private var drawingViewModel = DrawingViewModel()
+    @EnvironmentObject var appState: AppState
+    
     var body: some View {
         ZStack {
             TabView(selection: $selectedTab) {
@@ -82,13 +84,13 @@ struct ContentView: View {
                     .navigationDestination(for: String.self) { route in
                         switch route {
                         case "drawing":
-                            DrawingView(navigationPath: $path)
+                            DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                         case "result":
                             ResultView(navigationPath: $path)
                         case "mainView":
                             ContentView()
                         case "analysis":
-                            ImageAnalysisView(navigationPath: $path)
+                            ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
                         default:
                             ContentView()
                         }
@@ -144,8 +146,10 @@ struct ContentView: View {
                 )
             }
         }
-        .onAppear {
-            UserDefaults.standard.set(UUID().uuidString, forKey: "uid")
+        .onAppear{
+            if ((UserDefaults.standard.string(forKey: "uid")?.isEmpty) != nil) {
+                appState.isLoggedIn = true
+            }
         }
     }
 }

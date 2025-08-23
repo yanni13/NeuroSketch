@@ -11,7 +11,7 @@ import UIKit
 
 struct DrawingView: View {
     @Environment(\.presentationMode) var presentationMode
-    @StateObject private var viewModel = DrawingViewModel()
+    @ObservedObject var viewModel: DrawingViewModel
     @State private var drawing = PKDrawing()
     @State private var selectedTool: DrawingTool = .pen
     @State private var navigateToResult = false
@@ -58,13 +58,7 @@ struct DrawingView: View {
                 Button(action: {
                     saveDrawingToPhotos()
                     navigationPath.append("analysis")
-                    
-                    viewModel.analyzeDrawing(drawing) { success in
-                        if success {
-                            navigationPath.append("result")
-                            //TODO: 분석 화면 이동 구현
-                        }
-                    }
+                    viewModel.drawing = drawing
                 }, label: {
                     Text("완료")
                         .foregroundStyle(.black)

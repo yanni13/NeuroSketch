@@ -13,6 +13,7 @@ struct ImageAnalysisView: View {
     @State private var savedImage: UIImage?
     @State private var isAnalyzing = false
     @Binding var navigationPath: NavigationPath
+    @ObservedObject var viewModel: DrawingViewModel
     
     var body: some View {
         VStack(spacing: 0) {
@@ -55,6 +56,7 @@ struct ImageAnalysisView: View {
         .onAppear {
             loadSavedImage()
             startAnalysis()
+            analyzeDrawing()
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -92,17 +94,33 @@ struct ImageAnalysisView: View {
     private func startAnalysis() {
         isAnalyzing = true
         
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+        // 25초 동안 진행되도록 설정
+        let totalDuration: Double = 25.0  // 25초
+        let updateInterval: Double = 0.1   // 0.1초마다 업데이트
+        let incrementPerUpdate = 1.0 / (totalDuration / updateInterval)  // 약 0.004씩 증가
+        
+        Timer.scheduledTimer(withTimeInterval: updateInterval, repeats: true) { timer in
             if progress < 1.0 {
-                progress = min(1.0, progress + 0.02)
+                progress = min(1.0, progress + incrementPerUpdate)
+                
                 if progress >= 1.0 {
                     timer.invalidate()
                     isAnalyzing = false
                     
+                    // 분석 완료 후 1초 대기하고 다음 화면으로 이동
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                         navigationPath.append("result")
                     }
                 }
+            }
+        }
+    }
+    
+    private func analyzeDrawing(){
+        viewModel.analyzeDrawing() { success in
+            if success {
+                print("analyzeDrawing 요청 성공")
+//                navigationPath.append("result")
             }
         }
     }
