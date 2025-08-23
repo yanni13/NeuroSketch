@@ -8,19 +8,19 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var isDrawing: Bool = false
-    
     var body: some View {
-        VStack {
-            Button(action: {
-                isDrawing = true
-            }, label: {
-                Text("그림 그리기")
-            })
-        }
-        .padding()
-        .fullScreenCover(isPresented: $isDrawing) {
-            DrawingView()
+        NavigationStack {
+            VStack {
+                // 메인 콘텐츠 영역
+            }
+            .padding()
+            .toolbar {
+                ToolbarItem(placement:  .navigationBarTrailing) {
+                    NavigationLink(destination: DrawingView()) {
+                        Image(systemName: "pencil")
+                    }
+                }
+            }
         }
     }
 }
