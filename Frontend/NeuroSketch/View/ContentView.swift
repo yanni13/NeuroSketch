@@ -75,7 +75,9 @@ struct ContentView: View {
                 .navigationDestination(for: String.self) { route in
                     switch route {
                     case "drawing":
-                        DrawingView()
+                        DrawingView(navigationPath: $navigationPath)
+                    case "result":
+                        ResultView()
                     default:
                         EmptyView()
                     }

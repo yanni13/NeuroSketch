@@ -14,6 +14,8 @@ struct DrawingView: View {
     @StateObject private var viewModel = DrawingViewModel()
     @State private var drawing = PKDrawing()
     @State private var selectedTool: DrawingTool = .pen
+    @State private var navigateToResult = false
+    @Binding var navigationPath: NavigationPath
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -56,13 +58,12 @@ struct DrawingView: View {
                 Button(action: {
                     
                     saveDrawingToPhotos()
-                    presentationMode.wrappedValue.dismiss()
+                    navigationPath.append("result")
                     
                     viewModel.analyzeDrawing(drawing) { success in
                         if success {
 //                            saveDrawingToPhotos()
-//                            presentationMode.wrappedValue.dismiss()
-                            //TODO: 분석 화면 이동 구현
+//                            navigationPath.append("result")
                         }
                     }
                 }, label: {

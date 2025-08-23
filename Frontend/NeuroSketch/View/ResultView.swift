@@ -19,48 +19,59 @@ struct Triangle: Shape {
 }
 
 struct ResultView: View {
+    @State private var showSuccessPopUp = false
+    
     var body: some View {
-        VStack {
-            // 말풍선
-            ZStack {
-                Image("SpeechBallon")
-                    .resizable()
-                    .frame(maxWidth: 300, maxHeight: 100)
-                    .shadow(radius: 10)
-                
-                Text("응원 메시지")
-                    .multilineTextAlignment(.center)
-                    .offset(y: -10)
-            }
-            
-            Rectangle()
-                .frame(width: 300, height: 300)
-            
-            Spacer().frame(height: 40)
-
-            Text("새싹")
-                .padding(3)
-            
-            Spacer().frame(height: 12)
-            
-            Text("분석내용분석내용분석내용")
-                .padding(3)
-            
-            Spacer().frame(height: 40)
-            
-            VStack(alignment: .leading, spacing: 12) {
-                Text("할 일")
-                    .multilineTextAlignment(.leading)
-                
-                CheckListButton(
-                    text: "산책하기"
-                ) {
+        ZStack {
+            VStack {
+                // 말풍선
+                ZStack {
+                    Image("SpeechBallon")
+                        .resizable()
+                        .frame(maxWidth: 300, maxHeight: 100)
+                        .shadow(radius: 10)
                     
+                    Text("응원 메시지")
+                        .multilineTextAlignment(.center)
+                        .offset(y: -10)
+                }
+                
+                Rectangle()
+                    .frame(width: 300, height: 300)
+                
+                Spacer().frame(height: 40)
+                
+                Text("새싹")
+                    .padding(3)
+                
+                Spacer().frame(height: 12)
+                
+                Text("분석내용분석내용분석내용")
+                    .padding(3)
+                
+                Spacer().frame(height: 40)
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("할 일")
+                        .multilineTextAlignment(.leading)
+                    
+                    CheckListButton(
+                        text: "산책하기"
+                    ) {
+                        showSuccessPopUp = true
+                    }
                 }
             }
+            .padding(.bottom, 20)
+            .padding(.horizontal, 24)
+            
+            if showSuccessPopUp {
+                Color.black.opacity(0.35)
+                    .ignoresSafeArea()
+                
+                SuccessPopUpView(showPopUp: $showSuccessPopUp)
+            }
         }
-        .padding(.bottom, 20)
-        .padding(.horizontal, 24)
         .navigationBarBackButtonHidden()
         .navigationTitle("분석결과")
         .navigationBarTitleDisplayMode(.inline)
