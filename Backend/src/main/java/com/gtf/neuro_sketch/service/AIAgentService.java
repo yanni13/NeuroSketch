@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gtf.neuro_sketch.model.AgentDecision;
 import com.gtf.neuro_sketch.model.EmotionalState;
 import com.gtf.neuro_sketch.model.UserPsychologicalProfile;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -154,6 +155,7 @@ public class AIAgentService {
         );
     }
 
+    @Getter
     private static class AgentDecisionResult {
         public String decisionType;
         public String reasoning;
@@ -162,28 +164,5 @@ public class AIAgentService {
         public String nextDrawingTheme;
         public boolean requiresImmediate;
 
-        public String getDecisionType() {
-            return decisionType;
-        }
-
-        public String getReasoning() {
-            return reasoning;
-        }
-
-        public int getUrgencyLevel() {
-            return urgencyLevel;
-        }
-
-        public List<String> getRecommendedActions() {
-            return recommendedActions;
-        }
-
-        public String getNextDrawingTheme() {
-            return nextDrawingTheme;
-        }
-
-        public boolean isRequiresImmediate() {
-            return requiresImmediate;
-        }
     }
 }
