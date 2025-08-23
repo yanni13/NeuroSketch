@@ -6,15 +6,17 @@
 //
 
 import SwiftUI
+import Lottie
 
 struct ContentView: View {
     @State private var selectedTab = 0
-    @State private var navigationPath = NavigationPath()
+    @State private var path = NavigationPath()
+    @State private var showSuccessPopUp = false
     
     var body: some View {
         ZStack {
             TabView(selection: $selectedTab) {
-                NavigationStack(path: $navigationPath) {
+                NavigationStack(path: $path) {
                     VStack {
                         // 커스텀 헤더
                         HStack {
@@ -22,7 +24,7 @@ struct ContentView: View {
                                 .font(.title3)
                             Spacer()
                             Button(action: {
-                                navigationPath.append("drawing")
+                                path.append("drawing")
                             }) {
                                 Image(systemName: "square.and.pencil")
                                     .resizable()
@@ -44,11 +46,11 @@ struct ContentView: View {
                         
                         Spacer()
                         
-                        // 화분 이미지
-                        Rectangle()
-                            .frame(width: 166, height: 144)
+                        LottieComponent()
+                            .frame(width: 166, height: 137)
                         
                         Spacer()
+                        
                         VStack(alignment: .leading) {
                             Text("할 일")
                                 .foregroundStyle(.black)
@@ -59,8 +61,10 @@ struct ContentView: View {
                             // 체크리스트 버튼
                             CheckListButton(
                                 text: "생성전TodoList"
-                            ) {
-                                
+                            ) { isCompleted in
+                                if isCompleted {
+                                    showSuccessPopUp = true
+                                }
                             }
                             .padding(.bottom, 65)
                         }
@@ -75,9 +79,13 @@ struct ContentView: View {
                     .navigationDestination(for: String.self) { route in
                         switch route {
                         case "drawing":
-                            DrawingView()
+                            DrawingView(navigationPath: $path)
+                        case "result":
+                            ResultView(navigationPath: $path)
+                        case "mainView":
+                            ContentView()
                         default:
-                            EmptyView()
+                            ContentView()
                         }
                     }
                 }
@@ -113,6 +121,14 @@ struct ContentView: View {
                     }
                 }
                 .padding(.bottom, 55)
+            }
+            
+            // 팝업 오버레이
+            if showSuccessPopUp {
+                Color.black.opacity(0.35)
+                    .ignoresSafeArea()
+                
+                SuccessPopUpView(showPopUp: $showSuccessPopUp, navigationPath: $path)
             }
         }
         .onAppear{

@@ -10,12 +10,12 @@ import SwiftUI
 struct CheckListButton: View {
     let text: String
     @State private var isCompleted = false
-    let action: () -> Void
+    let action: (_ isCompleted: Bool) -> Void
     
     var body: some View {
         Button(action: {
             isCompleted.toggle()
-            action()
+            action(isCompleted)
         }) {
             ZStack(alignment: .leading) {
                 Rectangle()

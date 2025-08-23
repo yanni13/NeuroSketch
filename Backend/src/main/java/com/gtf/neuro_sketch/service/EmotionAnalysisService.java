@@ -3,6 +3,7 @@ package com.gtf.neuro_sketch.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gtf.neuro_sketch.model.EmotionalState;
+import com.gtf.neuro_sketch.model.ImageAnalysisResult;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,15 +17,17 @@ public class EmotionAnalysisService {
     private final SolarAIService solarAIService;
     private final ObjectMapper objectMapper;
 
-    public EmotionalState analyzeEmotion(String imageAnalysisResult) {
+    public EmotionalState analyzeEmotion(ImageAnalysisResult imageAnalysisResult) {
         String emotionAnalysisPrompt = buildEmotionAnalysisPrompt(imageAnalysisResult);
         String aiResponse = solarAIService.generateResponse(emotionAnalysisPrompt);
 
         return parseEmotionAnalysisResult(aiResponse);
     }
 
-    private String buildEmotionAnalysisPrompt(String imageAnalysisResult) {
-        return String.format("""
+    private String buildEmotionAnalysisPrompt(ImageAnalysisResult imageAnalysisResult) {
+        try {
+            String analysisJson = objectMapper.writeValueAsString(imageAnalysisResult);
+            return String.format("""
                 다음 그림 분석 결과를 바탕으로 사용자의 감정 상태를 분석하여 JSON 형태로 정확하게 답변해주세요:
                 
                 그림 분석 결과:
@@ -46,7 +49,21 @@ public class EmotionAnalysisService {
                 - PEACE: 중성 색온도, 체계적 구성, 보통 강도의 특성
                 
                 반드시 ```json ```으로 감싸지 말고 JSON 형식으로 반환하세요.
-                """, imageAnalysisResult);
+                """, analysisJson);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize ImageAnalysisResult", e);
+            return """
+                그림 분석 결과 직렬화에 실패했습니다. 기본 감정 분석을 수행합니다.
+                
+                다음 형식으로 감정 분석 결과를 반환하세요:
+                {
+                    "primaryEmotion": "PEACE",
+                    "intensity": 5,
+                    "confidence": 0.5,
+                    "reasoning": "분석 데이터 직렬화 실패로 인한 기본값"
+                }
+                """;
+        }
     }
 
     private EmotionalState parseEmotionAnalysisResult(String aiResponse) {

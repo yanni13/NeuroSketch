@@ -14,6 +14,8 @@ struct DrawingView: View {
     @StateObject private var viewModel = DrawingViewModel()
     @State private var drawing = PKDrawing()
     @State private var selectedTool: DrawingTool = .pen
+    @State private var navigateToResult = false
+    @Binding var navigationPath: NavigationPath
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -45,7 +47,7 @@ struct DrawingView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    presentationMode.wrappedValue.dismiss()
+                    navigationPath = NavigationPath()
                 }, label: {
                     Image(systemName: "chevron.left")
                         .foregroundStyle(.black)
@@ -55,11 +57,9 @@ struct DrawingView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     
-                    presentationMode.wrappedValue.dismiss()
-                    
                     viewModel.analyzeDrawing(drawing) { success in
                         if success {
-                            presentationMode.wrappedValue.dismiss()
+                            navigationPath.append("result")
                             //TODO: 분석 화면 이동 구현
                         }
                     }
@@ -70,6 +70,31 @@ struct DrawingView: View {
             }
         }
         .navigationBarBackButtonHidden()
+    }
+
+    private func saveDrawingToPhotos() {
+        guard let image = drawing.asImage(size: UIScreen.main.bounds.size)
+        else { return }
+
+        saveImageToDocuments(image: image)
+    }
+    
+    private func saveImageToDocuments(image: UIImage) {
+        guard let data = image.pngData() else { return }
+
+        let fileName = "drawing_\(Date().timeIntervalSince1970).png"
+        let documentsPath = FileManager.default.urls(
+            for: .documentDirectory,
+            in: .userDomainMask
+        )[0]
+        let fileURL = documentsPath.appendingPathComponent(fileName)
+
+        do {
+            try data.write(to: fileURL)
+            print("Drawing saved to: \(fileURL.path)")
+        } catch {
+            print("Error saving drawing: \(error)")
+        }
     }
 }
 

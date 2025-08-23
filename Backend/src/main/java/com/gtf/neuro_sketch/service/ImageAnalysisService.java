@@ -3,8 +3,10 @@ package com.gtf.neuro_sketch.service;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gtf.neuro_sketch.model.ImageAnalysisResult;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +17,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageAnalysisService {
@@ -28,7 +31,7 @@ public class ImageAnalysisService {
     @Value("${openai.api.url}")
     private String apiUrl;
 
-    public String analyzeImage(MultipartFile imageFile) throws IOException {
+    public ImageAnalysisResult analyzeImage(MultipartFile imageFile) throws IOException {
         String analysisPrompt = buildAnalysisPrompt();
         String base64Image = Base64.getEncoder().encodeToString(imageFile.getBytes());
 
@@ -55,11 +58,18 @@ public class ImageAnalysisService {
                 .retrieve()
                 .bodyToMono(ChatGPTResponse.class)
                 .block();
+        log.info("ChatGPT response: {}", response);
 
-        if (response != null) {
-            return response.getChoices().getFirst().getMessage().getContent();
+        if (response != null && !response.getChoices().isEmpty()) {
+            String jsonContent = response.getChoices().getFirst().getMessage().getContent();
+            try {
+                return objectMapper.readValue(jsonContent, ImageAnalysisResult.class);
+            } catch (Exception e) {
+                log.error("Failed to parse image analysis JSON response: {}", jsonContent, e);
+                return new ImageAnalysisResult(); // Return empty object if parsing fails
+            }
         }
-        return "";
+        return new ImageAnalysisResult();
     }
 
     private String buildAnalysisPrompt() {
@@ -68,11 +78,39 @@ public class ImageAnalysisService {
                 
                 {
                     "detected_objects": ["실제로 그림에서 발견되는 객체들의 배열"],
+                    "object_details": [
+                        {
+                            "object_name": "객체명",
+                            "position": {
+                                "location": "왼쪽상단/왼쪽중앙/왼쪽하단/중앙상단/중앙/중앙하단/오른쪽상단/오른쪽중앙/오른쪽하단",
+                                "relative_size": "매우큰/큰/보통/작은/매우작은",
+                                "prominence": "매우두드러짐/두드러짐/보통/미미함"
+                            },
+                            "visual_characteristics": {
+                                "colors": ["해당 객체에 사용된 색상들"],
+                                "line_style": "굵음/가늘음/일정하지않음/혼재",
+                                "detail_level": "매우세밀/세밀/보통/단순/매우단순",
+                                "completion_state": "완성/미완성/스케치수준"
+                            },
+                            "spatial_relationships": {
+                                "connection_to_others": "연결됨/분리됨/겹침/인접함",
+                                "interaction_type": "상호작용있음/독립적/부분적연결",
+                                "relative_placement": "전경/중경/배경"
+                            },
+                            "symbolic_indicators": {
+                                "traditional_meaning": "해당 객체의 일반적 상징적 의미",
+                                "art_therapy_significance": "그림치료에서 이 객체가 시사하는 심리적 의미",
+                                "contextual_meaning": "이 그림 내에서의 맥락적 의미",
+                                "emotional_expression": "이 객체가 표현하는 감정적 뉘앙스"
+                            }
+                        }
+                    ],
                     "colors_used": ["그림에서 사용된 주요 색상들"],
                     "dominant_colors": ["가장 많이 사용된 상위 3개 색상"],
                     "composition": {
                         "balance": "균형잡힌/왼쪽치우침/오른쪽치우침/위쪽치우침/아래쪽치우침/중앙집중/산만함 중 하나",
-                        "space_usage": "전체적으로사용/한쪽에치우침/중앙집중/모서리집중 중 하나"
+                        "space_usage": "전체적으로사용/한쪽에치우침/중앙집중/모서리집중 중 하나",
+                        "hierarchy": "명확한주객구분/혼재된구성/균등한배치"
                     },
                     "drawing_characteristics": {
                         "line_quality": "굵음/가늘음/일정하지않음/혼재 중 하나",
@@ -88,11 +126,17 @@ public class ImageAnalysisService {
                         "completion_level": "완성도높음/보통/미완성 중 하나",
                         "detail_level": "매우세밀/보통/단순 중 하나",
                         "organization": "체계적/보통/무질서 중 하나"
+                    },
+                    "overall_impression": {
+                        "narrative_quality": "이야기성있음/정적장면/추상적표현",
+                        "emotional_tone": "긍정적/중립적/부정적/혼재",
+                        "energy_level": "활동적/평온함/침체된/역동적"
                     }
                 }
                 
-                반드시 JSON 형식만 반환하고, 실제 그림에서 관찰되는 내용만을 객관적으로 기술하세요.
-                추측이나 해석을 포함하지 말고, 시각적으로 확인 가능한 사실만 기록하세요.
+                반드시 ```json ```으로 감싸지 말고 JSON 형식으로 반환하시고, 실제 그림에서 관찰되는 내용만을 객관적으로 기술하세요.
+                각 객체별로 위치, 시각적 특성, 공간 관계, 상징적 의미를 포함한 세부 분석을 제공하세요.
+                그림치료학적 관점에서 각 요소가 갖는 심리적 의미도 포함해주세요.
                 """;
     }
 
@@ -129,7 +173,7 @@ public class ImageAnalysisService {
     @Data
     static class ImageUrl {
         private String url;
-        
+
         public ImageUrl(String url) {
             this.url = url;
         }
