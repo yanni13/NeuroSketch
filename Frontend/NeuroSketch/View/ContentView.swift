@@ -70,7 +70,7 @@ struct ContentView: View {
                                 isCompleted: $isFirstTodoCompleted,
                                 showIcon: false
                             ) { isCompleted in
-                                if isCompleted, let firstTodo = contentViewModel.pendingTodos.first {
+                                if !isCompleted, let firstTodo = contentViewModel.pendingTodos.first {
                                     contentViewModel.completeTodo(todoId: firstTodo.id) { success in
                                         if success {
                                             showSuccessPopUp = true
