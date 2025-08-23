@@ -15,25 +15,50 @@ final class ImageService {
 
     func analyzeImage(
         request: ImageAnalysisRequestDto,
-        completion: @escaping (Result<Void, Error>) -> Void
+        completion: @escaping (Result<DrawingAnalysisResponseDto, Error>) -> Void
     ) {
-        let router = ImageRouter.analyzeImage(request: request)
-
-        AF.request(router)
-            .validate()
-            .response { response in
-                switch response.result {
-                case .success:
-                    // 응답 파싱은 제외하고 요청 성공만 처리
-                    completion(.success(()))
-                case .failure(let error):
-                    if let data = response.data,
-                        let json = String(data: data, encoding: .utf8)
-                    {
-                        print("📦 서버 응답 원본:\n\(json)")
+        AF.upload(
+            multipartFormData: { multipartFormData in
+                multipartFormData.append(
+                    request.file,
+                    withName: "file",
+                    fileName: "drawing.jpeg",
+                    mimeType: "multipart/form-data"
+                )
+            },
+            with: ImageRouter.analyzeImage(request: request)
+        )
+        .validate()
+        .response { response in
+            switch response.result {
+            case .success(let data):
+                if let data = data as? Data {
+                    
+                    do {
+                        let analysisResult = try DrawingAnalysisResponseDto.decode(from: data ?? Data())
+                        
+                        // 디버깅용 로그
+                        if let json = String(data: data, encoding: .utf8) {
+                            print("📦 서버 응답 성공:\n\(json)")
+                        }
+                        completion(.success(analysisResult))
+                        
+                    } catch {
+                        print("❌ JSON 파싱 실패: \(error)")
+                        if let json = String(data: data, encoding: .utf8) {
+                            print("📦 원본 JSON:\n\(json)")
+                        }
+                        completion(.failure(error))
                     }
-                    completion(.failure(error))
                 }
+            case .failure(let error):
+                if let data = response.data,
+                   let json = String(data: data, encoding: .utf8)
+                {
+                    print("📦 서버 응답 원본:\n\(json)")
+                }
+                completion(.failure(error))
             }
+        }
     }
 }

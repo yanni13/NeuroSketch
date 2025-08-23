@@ -55,13 +55,11 @@ struct DrawingView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     
-                    saveDrawingToPhotos()
                     presentationMode.wrappedValue.dismiss()
                     
                     viewModel.analyzeDrawing(drawing) { success in
                         if success {
-//                            saveDrawingToPhotos()
-//                            presentationMode.wrappedValue.dismiss()
+                            presentationMode.wrappedValue.dismiss()
                             //TODO: 분석 화면 이동 구현
                         }
                     }
@@ -72,31 +70,6 @@ struct DrawingView: View {
             }
         }
         .navigationBarBackButtonHidden()
-    }
-
-    private func saveDrawingToPhotos() {
-        guard let image = drawing.asImage(size: UIScreen.main.bounds.size)
-        else { return }
-
-        saveImageToDocuments(image: image)
-    }
-    
-    private func saveImageToDocuments(image: UIImage) {
-        guard let data = image.pngData() else { return }
-
-        let fileName = "drawing_\(Date().timeIntervalSince1970).png"
-        let documentsPath = FileManager.default.urls(
-            for: .documentDirectory,
-            in: .userDomainMask
-        )[0]
-        let fileURL = documentsPath.appendingPathComponent(fileName)
-
-        do {
-            try data.write(to: fileURL)
-            print("Drawing saved to: \(fileURL.path)")
-        } catch {
-            print("Error saving drawing: \(error)")
-        }
     }
 }
 
