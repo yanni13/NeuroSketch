@@ -35,9 +35,4 @@ out/
 
 ### VS Code ###
 .vscode/
-
-### Kotlin ###
-.kotlin
-
-.cursor
-*/CLAUDE.md
+.env
