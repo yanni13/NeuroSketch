@@ -20,7 +20,7 @@ struct DrawingAnalysisResponseDto: Codable {
     let imageAnalysis: ImageAnalysis
     let psychologicalInterpretation: PsychologicalInterpretation
     let aiAdvice: String
-    let recommendedActivities: [String]
+    let recommendedActivities: [RecommendedActivity]
     let nextDrawingThemeDescription: String
 }
 
@@ -233,6 +233,16 @@ struct ArtTherapyInsight: Codable {
     let observation: String
     let psychologicalMeaning: String
     let artTherapyContext: String
+}
+
+// MARK: - Recommended Activity
+struct RecommendedActivity: Codable {
+    let id: Int
+    let userId: String
+    let activity: String
+    let createdAt: String
+    let updatedAt: String
+    let done: Bool
 }
 
 // MARK: - Usage Example

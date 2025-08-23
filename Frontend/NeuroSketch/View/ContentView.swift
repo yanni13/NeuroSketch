@@ -100,7 +100,7 @@ struct ContentView: View {
                         case "analysis":
                             ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
                         case "detailView":
-                            ResultDetailView(navigationPath: $path)
+                            ResultDetailView(navigationPath: $path, drawingViewModel: drawingViewModel)
                         default:
                             ContentView()
                         }
