@@ -181,7 +181,7 @@ struct ContentView: View {
                         Text("할 일")
                         
                         CheckListButton(text: "산책하기", isCompleted: false, showIcon: true, action: { isCompleted in
-                            
+                            path.append("result")
                         })
                     }
                     
@@ -189,7 +189,7 @@ struct ContentView: View {
                         Text("완료한 일")
                         
                         CheckListButton(text: "산책하기", isCompleted: true, showIcon: true, action: { isCompleted in
-                            
+                            path.append("result")
                         })
                     }
                     
