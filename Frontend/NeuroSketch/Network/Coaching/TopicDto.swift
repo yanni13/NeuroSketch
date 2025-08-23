@@ -9,5 +9,8 @@ import Foundation
 
 // MARK: - Next Topic Response DTO
 struct NextTopicResponseDto: Codable {
-    let topic: String
+    let id: Int
+    let userId: String
+    let content: String
+    let createdAt: String
 }

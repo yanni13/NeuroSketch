@@ -32,22 +32,13 @@ enum CoachingRouter: URLRequestConvertible {
             return "/api/users/\(uid)/todos"
         case .completeTodo(let uid, let todoId):
             return "/api/users/\(uid)/todos/\(todoId)"
-        case .fetchNextTopic:
-            return "/api/coaching/topic/next"
+        case .fetchNextTopic(let uid):
+            return "/api/users/\(uid)/topics/next"
         }
     }
     
     func asURLRequest() throws -> URLRequest {
-        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
-        
-        switch self {
-        case .fetchNextTopic(let uid):
-            components.queryItems = [
-                URLQueryItem(name: "uid", value: uid)
-            ]
-        default:
-            break
-        }
+        let components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
         
         guard let url = components.url else {
             throw AFError.invalidURL(url: baseURL)

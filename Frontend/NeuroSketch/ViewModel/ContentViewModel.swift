@@ -13,11 +13,11 @@ class ContentViewModel: ObservableObject {
     @Published var errorMessage: String?
     
     var pendingTodos: [TodoItemResponseDto] {
-        return todoItems.filter { !$0.completed }
+        return todoItems.filter { !$0.isDone }
     }
     
     var completedTodos: [TodoItemResponseDto] {
-        return todoItems.filter { $0.completed }
+        return todoItems.filter { $0.isDone }
     }
     
     func fetchTodoList() {
@@ -35,8 +35,8 @@ class ContentViewModel: ObservableObject {
                 
                 switch result {
                 case .success(let response):
-                    print("투두리스트 조회 성공: \(response.todos.count)개")
-                    self?.todoItems = response.todos
+//                    print("투두리스트 조회 성공: \(response.todos.count)개")
+                    self?.todoItems = response
                     self?.errorMessage = nil
                 case .failure(let error):
                     print("투두리스트 조회 실패: \(error)")
