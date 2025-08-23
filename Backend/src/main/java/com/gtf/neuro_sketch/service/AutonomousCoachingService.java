@@ -2,6 +2,8 @@ package com.gtf.neuro_sketch.service;
 
 import com.gtf.neuro_sketch.event.CoachingDataSaveEvent;
 import com.gtf.neuro_sketch.model.*;
+import com.gtf.neuro_sketch.repository.RecommendedActivityRepository;
+import com.gtf.neuro_sketch.repository.ThemeDescriptionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,6 +26,8 @@ public class AutonomousCoachingService {
     private final PsychologicalInterpretationService interpretationService;
     private final CareStatusService careStatusService;
     private final ApplicationEventPublisher eventPublisher;
+    private final RecommendedActivityRepository recommendedActivityRepository;
+    private final ThemeDescriptionRepository themeDescriptionRepository;
 
     public CoachingResponse processImageAndProvideCoaching(String userId, MultipartFile imageFile) throws IOException {
         log.info("Starting autonomous coaching process for user: {}", userId);
@@ -66,8 +70,15 @@ public class AutonomousCoachingService {
         List<String> recommendations = profileService.getRecommendations(userId);
         List<String> recommendedActivities = generateRecommendedActivities(emotionalState, careStatus);
 
+        // 추천 활동을 DB에 저장
+        List<RecommendedActivity> recommendedActivityList = saveRecommendedActivitiesToDatabase(userId, recommendedActivities);
+
+
         // 다음 그림 주제 상세 설명
         String nextThemeDescription = generateNextDrawingThemeDescription(decision.getNextDrawingTheme(), emotionalState);
+        
+        // 주제 설명을 DB에 저장
+        saveThemeDescriptionToDatabase(userId, nextThemeDescription);
 
         // 종합 응답 생성
         CoachingResponse response = new CoachingResponse(
@@ -82,7 +93,7 @@ public class AutonomousCoachingService {
                 imageAnalysisResult,
                 psychInterpretation,
                 aiAdvice,
-                recommendedActivities,
+                recommendedActivityList,
                 nextThemeDescription
         );
 
@@ -239,7 +250,7 @@ public class AutonomousCoachingService {
                 null,  // 이미지 분석 결과는 없음
                 null,  // 심리학적 해석도 없음
                 aiAdvice,
-                recommendedActivities,
+                recommendedActivities.stream().map(RecommendedActivity::dummy).toList(),
                 nextThemeDescription
         );
     }
@@ -272,8 +283,67 @@ public class AutonomousCoachingService {
                 null,  // 이미지 분석 결과 없음
                 null,  // 심리학적 해석 없음
                 "그림을 통한 여정을 시작하는 것을 환영합니다. 어떤 색깔이든 어떤 형태든 자유롭게 표현해보세요.",
-                List.of("기본적인 도형 그리기로 시작하기", "좋아하는 색깔 사용해보기", "간단한 패턴이나 선 그리기"),
+                List.of(
+                        RecommendedActivity.dummy("기본적인 도형 그리기로 시작하기"),
+                        RecommendedActivity.dummy("좋아하는 색깔 사용해보기"),
+                        RecommendedActivity.dummy("간단한 패턴이나 선 그리기")
+                ),
                 "첫 번째 그림에서는 특별한 규칙 없이 마음가는 대로 그려보세요. 지금 이 순간의 느낌을 색깔과 선으로 표현해보는 것만으로도 충분합니다. 완벽할 필요는 전혀 없어요!"
         );
+    }
+
+    private List<RecommendedActivity> saveRecommendedActivitiesToDatabase(String userId, List<String> recommendedActivities) {
+        List<RecommendedActivity> savedActivities = new ArrayList<>();
+        try {
+            for (String activity : recommendedActivities) {
+                Long activityId = recommendedActivityRepository.saveRecommendedActivity(userId, activity);
+                RecommendedActivity savedActivity = new RecommendedActivity(
+                        activityId,
+                        userId,
+                        activity,
+                        false,
+                        java.time.LocalDateTime.now(),
+                        java.time.LocalDateTime.now()
+                );
+                savedActivities.add(savedActivity);
+                log.info("Saved recommended activity for user: {} - Activity ID: {}, Activity: {}",
+                        userId, activityId, activity);
+            }
+            log.info("Successfully saved {} recommended activities for user: {}",
+                    recommendedActivities.size(), userId);
+        } catch (Exception e) {
+            log.error("Failed to save recommended activities for user: {} - Error: {}", userId, e.getMessage());
+        }
+        return savedActivities;
+    }
+
+    public List<RecommendedActivity> getPendingRecommendedActivities(String userId) {
+        log.info("Fetching pending recommended activities for user: {}", userId);
+        return recommendedActivityRepository.findPendingActivitiesByUserId(userId);
+    }
+
+    public List<RecommendedActivity> getAllRecommendedActivities(String userId) {
+        log.info("Fetching all recommended activities for user: {}", userId);
+        return recommendedActivityRepository.findAllActivitiesByUserId(userId);
+    }
+
+    public void markActivityAsDone(Long activityId) {
+        log.info("Marking activity as done: {}", activityId);
+        recommendedActivityRepository.markActivityAsDone(activityId);
+    }
+
+    private void saveThemeDescriptionToDatabase(String userId, String content) {
+        try {
+            Long themeDescriptionId = themeDescriptionRepository.saveThemeDescription(userId, content);
+            log.info("Saved theme description for user: {} - Theme Description ID: {}, Content: {}", 
+                    userId, themeDescriptionId, content);
+        } catch (Exception e) {
+            log.error("Failed to save theme description for user: {} - Error: {}", userId, e.getMessage());
+        }
+    }
+
+    public ThemeDescription getLatestThemeDescription(String userId) {
+        log.info("Fetching latest theme description for user: {}", userId);
+        return themeDescriptionRepository.findLatestByUserId(userId);
     }
 }

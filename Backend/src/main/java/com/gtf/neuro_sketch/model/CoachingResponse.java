@@ -18,12 +18,12 @@ public class CoachingResponse {
     private String nextDrawingTheme;
     private boolean requiresFollowUp;
     private long timestamp;
-    
+
     // 새로 추가된 필드들
     private CareStatus careStatus;  // 케어 상태
     private ImageAnalysisResult imageAnalysis;  // 상세 그림 분석 결과
     private PsychologicalInterpretation psychologicalInterpretation;  // 심리학적 해석
     private String aiAdvice;  // AI 조언
-    private List<String> recommendedActivities;  // 추천 활동
+    private List<RecommendedActivity> recommendedActivities;  // 추천 활동
     private String nextDrawingThemeDescription;  // 다음 그림 주제 추천 문구
 }
