@@ -21,6 +21,7 @@ struct ResultView: View {
                         .resizable()
                         .frame(maxWidth: 300, maxHeight: 100)
                         .shadow(radius: 2)
+                        .border(.black)
                     
                     Text("응원 메시지")
                         .multilineTextAlignment(.center)
