@@ -25,40 +25,41 @@ public class AIAgentService {
 
     public AgentDecision makeAutonomousDecision(String userId, EmotionalState currentState) {
         UserPsychologicalProfile profile = profileService.getUserProfile(userId);
-        
+
         String decisionPrompt = buildDecisionPrompt(currentState, profile);
         String aiResponse = solarAIService.generateResponse(decisionPrompt);
-        
+        log.info("Solar AI Service response: {}", aiResponse);
+
         AgentDecision decision = parseAgentDecision(aiResponse);
-        
+
         if (profileService.isInterventionNeeded(userId)) {
             decision.setRequiresImmediate(true);
             decision.setUrgencyLevel(Math.max(decision.getUrgencyLevel(), 8));
         }
-        
+
         return decision;
     }
 
     private String buildDecisionPrompt(EmotionalState currentState, UserPsychologicalProfile profile) {
         StringBuilder contextInfo = new StringBuilder();
-        
+
         contextInfo.append("현재 감정 상태: ").append(currentState.getPrimaryEmotion())
-                   .append(" (강도: ").append(currentState.getIntensity()).append("/10)\n");
-        
+                .append(" (강도: ").append(currentState.getIntensity()).append("/10)\n");
+
         contextInfo.append("분석 근거: ").append(currentState.getReasoning()).append("\n");
-        
+
         contextInfo.append("사용자 회복력: ").append(profile.getResilience()).append("/10\n");
-        
+
         if (!profile.getEmotionalHistory().isEmpty()) {
             contextInfo.append("최근 감정 패턴: ");
-            profile.getEmotionalPatterns().forEach((key, value) -> 
-                contextInfo.append(key).append(": ").append(String.format("%.2f", value)).append(", ")
+            profile.getEmotionalPatterns().forEach((key, value) ->
+                    contextInfo.append(key).append(": ").append(String.format("%.2f", value)).append(", ")
             );
             contextInfo.append("\n");
         }
-        
+
         contextInfo.append("현재 시간: ").append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))).append("\n");
-        
+
         return String.format("""
                 당신은 심리 상담 전문가이자 자율적 AI Agent입니다. 
                 다음 사용자 정보를 분석하여 최적의 개입 방식을 결정하고 JSON 형태로 답변해주세요:
@@ -90,7 +91,7 @@ public class AIAgentService {
     private AgentDecision parseAgentDecision(String aiResponse) {
         try {
             AgentDecisionResult result = objectMapper.readValue(aiResponse, AgentDecisionResult.class);
-            
+
             AgentDecision decision = new AgentDecision();
             decision.setDecisionType(result.getDecisionType());
             decision.setReasoning(result.getReasoning());
@@ -99,7 +100,7 @@ public class AIAgentService {
             decision.setNextDrawingTheme(result.getNextDrawingTheme());
             decision.setRequiresImmediate(result.isRequiresImmediate());
             decision.setTimestamp(System.currentTimeMillis());
-            
+
             return decision;
         } catch (JsonProcessingException e) {
             log.error("Failed to parse agent decision result", e);
@@ -109,42 +110,42 @@ public class AIAgentService {
 
     private AgentDecision createDefaultDecision() {
         return new AgentDecision(
-            "MONITOR", 
-            "분석 실패로 인한 기본 모니터링 모드", 
-            5, 
-            Arrays.asList("현재 상태를 관찰합니다", "추가 정보가 필요합니다"), 
-            "자유로운 주제로 그림을 그려보세요", 
-            false, 
-            System.currentTimeMillis()
+                "MONITOR",
+                "분석 실패로 인한 기본 모니터링 모드",
+                5,
+                Arrays.asList("현재 상태를 관찰합니다", "추가 정보가 필요합니다"),
+                "자유로운 주제로 그림을 그려보세요",
+                false,
+                System.currentTimeMillis()
         );
     }
 
     public String generatePersonalizedMessage(String userId, AgentDecision decision, EmotionalState emotionalState) {
         UserPsychologicalProfile profile = profileService.getUserProfile(userId);
-        
+
         String messagePrompt = buildMessagePrompt(decision, emotionalState, profile);
         return solarAIService.generateResponse(messagePrompt);
     }
 
     private String buildMessagePrompt(AgentDecision decision, EmotionalState emotionalState, UserPsychologicalProfile profile) {
         return String.format("""
-                따뜻하고 공감적인 심리 코치로서 사용자에게 개인화된 메시지를 작성해주세요.
-                
-                현재 상황:
-                - 감정 상태: %s (강도: %d/10)
-                - Agent 결정: %s
-                - 개입 이유: %s
-                - 사용자 회복력: %d/10
-                
-                메시지 작성 가이드라인:
-                1. 따뜻하고 공감적인 톤으로 작성
-                2. 사용자의 감정을 인정하고 수용
-                3. 구체적이고 실행 가능한 조언 포함
-                4. 희망적이고 격려하는 메시지로 마무리
-                5. 길이는 2-4문장으로 간결하게
-                
-                JSON이나 다른 형식 없이 순수한 메시지 내용만 반환해주세요.
-                """, 
+                        따뜻하고 공감적인 심리 코치로서 사용자에게 개인화된 메시지를 작성해주세요.
+                        
+                        현재 상황:
+                        - 감정 상태: %s (강도: %d/10)
+                        - Agent 결정: %s
+                        - 개입 이유: %s
+                        - 사용자 회복력: %d/10
+                        
+                        메시지 작성 가이드라인:
+                        1. 따뜻하고 공감적인 톤으로 작성
+                        2. 사용자의 감정을 인정하고 수용
+                        3. 구체적이고 실행 가능한 조언 포함
+                        4. 희망적이고 격려하는 메시지로 마무리
+                        5. 길이는 2-4문장으로 간결하게
+                        
+                        JSON이나 다른 형식 없이 순수한 메시지 내용만 반환해주세요.
+                        """,
                 emotionalState.getPrimaryEmotion(),
                 emotionalState.getIntensity(),
                 decision.getDecisionType(),
@@ -161,11 +162,28 @@ public class AIAgentService {
         public String nextDrawingTheme;
         public boolean requiresImmediate;
 
-        public String getDecisionType() { return decisionType; }
-        public String getReasoning() { return reasoning; }
-        public int getUrgencyLevel() { return urgencyLevel; }
-        public List<String> getRecommendedActions() { return recommendedActions; }
-        public String getNextDrawingTheme() { return nextDrawingTheme; }
-        public boolean isRequiresImmediate() { return requiresImmediate; }
+        public String getDecisionType() {
+            return decisionType;
+        }
+
+        public String getReasoning() {
+            return reasoning;
+        }
+
+        public int getUrgencyLevel() {
+            return urgencyLevel;
+        }
+
+        public List<String> getRecommendedActions() {
+            return recommendedActions;
+        }
+
+        public String getNextDrawingTheme() {
+            return nextDrawingTheme;
+        }
+
+        public boolean isRequiresImmediate() {
+            return requiresImmediate;
+        }
     }
 }
