@@ -12,6 +12,7 @@ struct ResultView: View {
     @State private var showDetailView = false
     @State private var isCompleted = false
     @Binding var navigationPath: NavigationPath
+    @ObservedObject var drawingViewModel: DrawingViewModel
     
     var body: some View {
         ZStack {
@@ -23,9 +24,11 @@ struct ResultView: View {
                         .frame(maxWidth: 300, maxHeight: 100)
                         .shadow(radius: 2)
                     
-                    Text("응원 메시지")
+                    Text(drawingViewModel.analysisResult?.personalizedMessage ?? "응원 메시지")
                         .multilineTextAlignment(.center)
                         .offset(y: -10)
+                        .font(.system(size: 14))
+                        .padding(.horizontal, 20)
                 }
                 .offset(y: -60)
                 
@@ -34,13 +37,23 @@ struct ResultView: View {
                 
                 Spacer().frame(height: 60)
 
-                Text("새싹")
-                    .padding(3)
+                if let analysisResult = drawingViewModel.analysisResult {
+                    let koreanEmotion = EmotionUtils.getKoreanEmotion(for: analysisResult.analyzedEmotion.primaryEmotion)
+                    Text(koreanEmotion)
+                        .padding(3)
+                        .font(.system(size: 18, weight: .semibold))
+                } else {
+                    Text("새싹")
+                        .padding(3)
+                }
                 
                 Spacer().frame(height: 12)
                 
-                Text("분석내용분석내용분석내용")
+                Text(drawingViewModel.analysisResult?.aiAdvice ?? "분석 중입니다...")
                     .padding(3)
+                    .font(.system(size: 14))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
                 
                 Spacer().frame(height: 40)
                 
@@ -48,12 +61,24 @@ struct ResultView: View {
                     Text("할 일")
                         .multilineTextAlignment(.leading)
                     
-                    CheckListButton(
-                        text: "산책하기", isCompleted: $isCompleted, showIcon: false
-                    ) {
-                        isCompleted.toggle()
-                        if isCompleted {
-                            showSuccessPopUp = true
+                    if let activities = drawingViewModel.analysisResult?.recommendedActivities,
+                       let firstActivity = activities.first {
+                        CheckListButton(
+                            text: firstActivity, isCompleted: $isCompleted, showIcon: false
+                        ) {
+                            isCompleted.toggle()
+                            if isCompleted {
+                                showSuccessPopUp = true
+                            }
+                        }
+                    } else {
+                        CheckListButton(
+                            text: "산책하기", isCompleted: $isCompleted, showIcon: false
+                        ) {
+                            isCompleted.toggle()
+                            if isCompleted {
+                                showSuccessPopUp = true
+                            }
                         }
                     }
                 }

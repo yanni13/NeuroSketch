@@ -104,13 +104,13 @@ struct ContentView: View {
                         case "drawing":
                             DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                         case "result":
-                            ResultView(navigationPath: $path)
+                            ResultView(navigationPath: $path, drawingViewModel: drawingViewModel)
                         case "mainView":
                             ContentView()
                         case "analysis":
                             ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
                         case "detailView":
-                            ResultDetailView(navigationPath: $path)
+                            ResultDetailView(navigationPath: $path, drawingViewModel: drawingViewModel)
                         default:
                             ContentView()
                         }
@@ -241,13 +241,13 @@ struct ContentView: View {
                 case "drawing":
                     DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                 case "result":
-                    ResultView(navigationPath: $path)
+                    ResultView(navigationPath: $path, drawingViewModel: drawingViewModel)
                 case "mainView":
                     ContentView()
                 case "analysis":
                     ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
                 case "detailView":
-                    ResultDetailView(navigationPath: $path)
+                    ResultDetailView(navigationPath: $path, drawingViewModel: drawingViewModel)
                 default:
                     ContentView()
                 }
