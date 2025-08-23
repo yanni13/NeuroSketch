@@ -23,6 +23,7 @@ struct ContentView: View {
                         Text("NeuroSketch")
                             .font(.title3)
                         Spacer()
+                        
                         Button(action: {
                             path.append("drawing")
                         }) {
@@ -30,8 +31,9 @@ struct ContentView: View {
                                 .resizable()
                                 .frame(width: 20, height: 20)
                                 .foregroundColor(.black)
-                                .padding(4)
                         }
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                     }
                     .padding(.top, 8)
                     
@@ -45,9 +47,11 @@ struct ContentView: View {
                     }
                     
                     Spacer()
-                    
+              
                     LottieComponent()
                         .frame(width: 166, height: 137)
+                        .allowsHitTesting(false)
+
                     
                     Spacer()
                     
@@ -84,6 +88,8 @@ struct ContentView: View {
                         ResultView(navigationPath: $path)
                     case "mainView":
                         ContentView()
+                    case "analysis":
+                        ImageAnalysisView(navigationPath: $path)
                     default:
                         ContentView()
                     }
@@ -110,17 +116,19 @@ struct ContentView: View {
         }
         .tint(Color("green02"))
         
-        // 인디케이터
-        VStack {
-            Spacer()
-            HStack {
-                ForEach(0..<2, id: \.self) { index in
-                    Rectangle()
-                        .fill(selectedTab == index ? Color("green02") : Color.clear)
-                        .frame(height: 3)
+        // 인디케이터 (탭바가 표시될 때만)
+        if path.isEmpty {
+            VStack {
+                Spacer()
+                HStack {
+                    ForEach(0..<2, id: \.self) { index in
+                        Rectangle()
+                            .fill(selectedTab == index ? Color("green02") : Color.clear)
+                            .frame(height: 3)
+                    }
                 }
+                .padding(.bottom, 55)
             }
-            .padding(.bottom, 55)
         }
         
         // 팝업 오버레이
