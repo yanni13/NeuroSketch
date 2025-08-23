@@ -11,6 +11,7 @@ import UIKit
 
 struct DrawingView: View {
     @Environment(\.presentationMode) var presentationMode
+    @StateObject private var viewModel = DrawingViewModel()
     @State private var drawing = PKDrawing()
     @State private var selectedTool: DrawingTool = .pen
 
@@ -53,8 +54,17 @@ struct DrawingView: View {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
+                    
                     saveDrawingToPhotos()
                     presentationMode.wrappedValue.dismiss()
+                    
+                    viewModel.analyzeDrawing(drawing) { success in
+                        if success {
+//                            saveDrawingToPhotos()
+//                            presentationMode.wrappedValue.dismiss()
+                            //TODO: 분석 화면 이동 구현
+                        }
+                    }
                 }, label: {
                     Text("완료")
                         .foregroundStyle(.black)
@@ -70,7 +80,7 @@ struct DrawingView: View {
 
         saveImageToDocuments(image: image)
     }
-
+    
     private func saveImageToDocuments(image: UIImage) {
         guard let data = image.pngData() else { return }
 
