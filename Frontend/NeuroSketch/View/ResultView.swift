@@ -49,10 +49,7 @@ struct ResultView: View {
                     
                     CheckListButton(
                         text: "산책하기", isCompleted: .constant(false), showIcon: false
-                    ) { isCompleted in
-                        if isCompleted {
-                            showSuccessPopUp = true
-                        }
+                    ) {
                     }
                 }
             }
