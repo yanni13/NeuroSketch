@@ -50,5 +50,6 @@ struct CheckListButton: View {
                 .padding(.leading, 16)
             }
         }
+        .frame(height: 54)
     }
 }
