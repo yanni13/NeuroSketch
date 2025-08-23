@@ -7,7 +7,7 @@
 
 import Foundation
 
-//TODO: 수정 필요
+// TODO: 수정 필요
 struct SignupRequestDto: Codable {
     let uuid: String
 }
