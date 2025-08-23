@@ -84,7 +84,7 @@ public class AIAgentService {
                 - MONITOR: 상황 지켜보며 추가 정보 수집 필요
                 - INTERVENTION: 즉시 전문적 개입 필요
                 
-                반드시 JSON 형식만 반환하세요.
+                반드시 ```json ```으로 감싸지 말고 JSON 형식으로 반환하세요.
                 """, contextInfo.toString());
     }
 

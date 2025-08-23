@@ -45,7 +45,6 @@ public class SolarAIService {
                 .retrieve()
                 .bodyToMono(SolarResponse.class)
                 .block();
-        log.info("Solar response: {}", response);
 
         if (response != null && !response.getChoices().isEmpty()) {
             return response.getChoices().getFirst().getMessage().getContent();
