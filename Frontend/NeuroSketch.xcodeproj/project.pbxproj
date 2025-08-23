@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4683F3282E59854D00E96A32 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 4683F3272E59854D00E96A32 /* Alamofire */; };
+		D82D337D2E59E4170001E0B7 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = D82D337C2E59E4170001E0B7 /* Lottie */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4683F3282E59854D00E96A32 /* Alamofire in Frameworks */,
+				D82D337D2E59E4170001E0B7 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +86,7 @@
 			name = NeuroSketch;
 			packageProductDependencies = (
 				4683F3272E59854D00E96A32 /* Alamofire */,
+				D82D337C2E59E4170001E0B7 /* Lottie */,
 			);
 			productName = NeuroSketch;
 			productReference = 4683F2532E595B6400E96A32 /* NeuroSketch.app */;
@@ -115,6 +118,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				4683F3262E59854D00E96A32 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				D82D337B2E59E4170001E0B7 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4683F2542E595B6400E96A32 /* Products */;
@@ -370,6 +374,14 @@
 				minimumVersion = 5.10.2;
 			};
 		};
+		D82D337B2E59E4170001E0B7 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -377,6 +389,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4683F3262E59854D00E96A32 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		D82D337C2E59E4170001E0B7 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D82D337B2E59E4170001E0B7 /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

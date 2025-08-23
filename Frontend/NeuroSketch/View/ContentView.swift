@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Lottie
 
 struct ContentView: View {
     @State private var selectedTab = 0
@@ -45,9 +46,8 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    // 화분 이미지
-                    Rectangle()
-                        .frame(width: 166, height: 144)
+                    LottieComponent()
+                        .frame(width: 166, height: 137)
                     
                     Spacer()
                     
