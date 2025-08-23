@@ -17,6 +17,8 @@ struct ContentView: View {
     @StateObject private var contentViewModel = ContentViewModel()
     @EnvironmentObject var appState: AppState
     
+    @State private var firstTodoTopic = ""
+    
     var body: some View {
         ZStack {
             TabView(selection: $selectedTab) {
@@ -66,11 +68,11 @@ struct ContentView: View {
 
                             // 체크리스트 버튼
                             CheckListButton(
-                                text: contentViewModel.pendingTodos.first?.activity ?? "분석 결과에 따라 할 일을 추천해드려요",
+                                text: firstTodoTopic,
                                 isCompleted: $isFirstTodoCompleted,
                                 showIcon: false
-                            ) { isCompleted in
-                                if !isCompleted, let firstTodo = contentViewModel.pendingTodos.first {
+                            ) {
+                                if let firstTodo = contentViewModel.pendingTodos.first {
                                     contentViewModel.completeTodo(todoId: firstTodo.id) { success in
                                         if success {
                                             showSuccessPopUp = true
@@ -80,6 +82,14 @@ struct ContentView: View {
                                 }
                             }
                             .padding(.bottom, 65)
+                        }
+                    }
+                    .onAppear{
+                        isFirstTodoCompleted = false
+                        contentViewModel.fetchTodoList(){ success in
+                            if success {
+                                firstTodoTopic = contentViewModel.pendingTodos.first?.activity ?? "분석 결과에 따라 할 일을 추천해드려요"
+                            }
                         }
                     }
                     .padding(.horizontal, 24)
@@ -114,11 +124,7 @@ struct ContentView: View {
                     Text("홈")
                 }
                 .tag(0)
-                .onAppear{
-                    isFirstTodoCompleted = false
-                    contentViewModel.fetchTodoList()
-                }
-
+                
                 archiveTapBar
                     .tabItem {
                         Image(systemName: "tray")
@@ -199,7 +205,7 @@ struct ContentView: View {
                                     text: todo.activity,
                                     isCompleted: .constant(false),
                                     showIcon: true,
-                                    action: { isCompleted in
+                                    action: {
                                         path.append("result")
                                     }
                                 )
@@ -216,7 +222,7 @@ struct ContentView: View {
                                     text: todo.activity,
                                     isCompleted: .constant(true),
                                     showIcon: true,
-                                    action: { isCompleted in
+                                    action: { 
                                         path.append("result")
                                     }
                                 )
@@ -240,6 +246,8 @@ struct ContentView: View {
                     ContentView()
                 case "analysis":
                     ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
+                case "detailView":
+                    ResultDetailView(navigationPath: $path, drawingViewModel: drawingViewModel)
                 default:
                     ContentView()
                 }

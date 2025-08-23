@@ -11,11 +11,11 @@ struct CheckListButton: View {
     let text: String
     @Binding var isCompleted: Bool 
     let showIcon: Bool
-    let action: (_ isCompleted: Bool) -> Void
+    let action: () -> Void
     
     var body: some View {
         Button(action: {
-            action(isCompleted)
+            action()
         }) {
             ZStack(alignment: .leading) {
                 Rectangle()

@@ -10,6 +10,7 @@ import SwiftUI
 struct ResultView: View {
     @State private var showSuccessPopUp = false
     @State private var showDetailView = false
+    @State private var isCompleted = false
     @Binding var navigationPath: NavigationPath
     @ObservedObject var drawingViewModel: DrawingViewModel
     
@@ -63,16 +64,18 @@ struct ResultView: View {
                     if let activities = drawingViewModel.analysisResult?.recommendedActivities,
                        let firstActivity = activities.first {
                         CheckListButton(
-                            text: firstActivity, isCompleted: .constant(false), showIcon: false
-                        ) { isCompleted in
+                            text: firstActivity, isCompleted: $isCompleted, showIcon: false
+                        ) {
+                            isCompleted.toggle()
                             if isCompleted {
                                 showSuccessPopUp = true
                             }
                         }
                     } else {
                         CheckListButton(
-                            text: "산책하기", isCompleted: .constant(false), showIcon: false
-                        ) { isCompleted in
+                            text: "산책하기", isCompleted: $isCompleted, showIcon: false
+                        ) {
+                            isCompleted.toggle()
                             if isCompleted {
                                 showSuccessPopUp = true
                             }
