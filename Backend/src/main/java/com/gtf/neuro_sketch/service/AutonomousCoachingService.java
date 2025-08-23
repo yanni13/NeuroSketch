@@ -1,8 +1,10 @@
 package com.gtf.neuro_sketch.service;
 
+import com.gtf.neuro_sketch.event.CoachingDataSaveEvent;
 import com.gtf.neuro_sketch.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +23,7 @@ public class AutonomousCoachingService {
     private final AIAgentService agentService;
     private final PsychologicalInterpretationService interpretationService;
     private final CareStatusService careStatusService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public CoachingResponse processImageAndProvideCoaching(String userId, MultipartFile imageFile) throws IOException {
         log.info("Starting autonomous coaching process for user: {}", userId);
@@ -41,7 +44,7 @@ public class AutonomousCoachingService {
         // 사용자 프로필 업데이트
         profileService.updateUserProfile(userId, emotionalState);
         log.info("User profile updated for user: {}", userId);
-        
+
         // 케어 상태 평가
         UserPsychologicalProfile profile = profileService.getUserProfile(userId);
         CareStatus careStatus = careStatusService.assessCareStatus(userId, emotionalState, profile);
@@ -58,11 +61,11 @@ public class AutonomousCoachingService {
 
         // AI 조언 생성
         String aiAdvice = generateAIAdvice(emotionalState, careStatus, psychInterpretation);
-        
+
         // 추천 활동 생성
         List<String> recommendations = profileService.getRecommendations(userId);
         List<String> recommendedActivities = generateRecommendedActivities(emotionalState, careStatus);
-        
+
         // 다음 그림 주제 상세 설명
         String nextThemeDescription = generateNextDrawingThemeDescription(decision.getNextDrawingTheme(), emotionalState);
 
@@ -83,18 +86,36 @@ public class AutonomousCoachingService {
                 nextThemeDescription
         );
 
+        // 비동기 이벤트 발행 - DB 저장
+        CoachingDataSaveEvent saveEvent = new CoachingDataSaveEvent(
+                userId,
+                emotionalState,
+                imageAnalysisResult,
+                psychInterpretation,
+                decision,
+                careStatus,
+                personalizedMessage,
+                recommendations,
+                aiAdvice,
+                recommendedActivities,
+                nextThemeDescription,
+                System.currentTimeMillis()
+        );
+
+//        eventPublisher.publishEvent(saveEvent);
+
         log.info("Coaching response completed for user: {} - requires follow-up: {}",
                 userId, response.isRequiresFollowUp());
 
         return response;
     }
-    
+
     private String generateAIAdvice(EmotionalState emotionalState, CareStatus careStatus, PsychologicalInterpretation interpretation) {
         StringBuilder advice = new StringBuilder();
-        
+
         // 기본 AI 조언
         advice.append("그림을 통한 번리스러운 감정 표현을 보여주셨네요. ");
-        
+
         switch (emotionalState.getPrimaryEmotion()) {
             case "HAPPINESS" -> advice.append("현재의 긍정적인 에너지를 유지하며, 새로운 창작 활동에 도전해보세요.");
             case "SADNESS" -> advice.append("슬픔 감정도 소중한 자신의 일부입니다. 따뜻한 색갈을 사용한 그림으로 마음을 달래보세요.");
@@ -102,18 +123,18 @@ public class AutonomousCoachingService {
             case "ANXIETY" -> advice.append("불안한 마음을 그림으로 표현하는 것 자체가 치유의 시작입니다. 심호흡과 함께 차분한 그림에 집중해보세요.");
             case "PEACE" -> advice.append("평온한 마음 상태가 잘 표현되었네요. 이 안정감을 유지하며 더 깊이 자신을 탐구해보세요.");
         }
-        
+
         // 케어 상태에 따른 추가 조언
         if (careStatus.getUrgencyScore() >= 7) {
             advice.append(" 현재 감정 관리가 중요한 시기이니, 자신을 돌보는 시간을 충분히 가져주세요.");
         }
-        
+
         return advice.toString();
     }
-    
+
     private List<String> generateRecommendedActivities(EmotionalState emotionalState, CareStatus careStatus) {
         List<String> activities = new ArrayList<>();
-        
+
         // 감정 상태에 따른 추천 활동
         switch (emotionalState.getPrimaryEmotion()) {
             case "HAPPINESS" -> {
@@ -142,44 +163,45 @@ public class AutonomousCoachingService {
                 activities.add("더 깊이 있는 주제나 철학적 사고 표현하기");
             }
         }
-        
+
         // 케어 레벨에 따른 추가 추천
         if (careStatus.getLevel().equals("즉시_관리_필요")) {
             activities.add("전문가와 함께 하는 그룹 미술치료 참여");
             activities.add("안전한 환경에서 진행하는 자유로운 표현 시간");
         }
-        
+
         return activities;
     }
-    
+
     private String generateNextDrawingThemeDescription(String theme, EmotionalState emotionalState) {
         if (theme == null || theme.trim().isEmpty()) {
             theme = "자유로운 표현";
         }
-        
-        StringBuilder description = new StringBuilder();
-        description.append("다음 그림 주제로 '").append(theme).append("을(를) 제안드립니다. ");
-        
-        // 주제에 따른 상세 안내
-        if (theme.contains("희망") || theme.contains("미래")) {
-            description.append("밝은 색상과 상승하는 이미지로 긍정적인 에너지를 표현해보세요.");
-        } else if (theme.contains("자연") || theme.contains("풍경")) {
-            description.append("자연의 아름다움을 통해 내면의 평안을 찾아보세요.");
-        } else if (theme.contains("가족") || theme.contains("친구")) {
-            description.append("소중한 사람들과의 관계를 따뜻하게 표현해보세요.");
-        } else {
-            description.append("자신만의 독특한 시각과 감성으로 자유롭게 표현해보세요.");
-        }
-        
-        // 현재 감정 상태에 따른 추가 안내
-        switch (emotionalState.getPrimaryEmotion()) {
-            case "SADNESS" -> description.append(" 지금 시기에는 따뜻한 색감과 부드러운 선을 사용하는 것이 도움이 될 것 같아요.");
-            case "ANXIETY" -> description.append(" 마음이 진정될 수 있도록 규칙적인 패턴이나 대칭적 구성을 시도해보세요.");
-            case "ANGER" -> description.append(" 강한 감정을 건설적으로 표현할 수 있도록 다이내믹한 선과 대비를 활용해보세요.");
-            case "HAPPINESS" -> description.append(" 지금의 긍정적 에너지를 마음께 표현하며, 새로운 기법에도 도전해보세요.");
-        }
-        
-        return description.toString();
+
+//        StringBuilder description = new StringBuilder();
+//        description.append("다음 그림 주제로 '").append(theme).append("을(를) 제안드립니다. ");
+//
+//        // 주제에 따른 상세 안내
+//        if (theme.contains("희망") || theme.contains("미래")) {
+//            description.append("밝은 색상과 상승하는 이미지로 긍정적인 에너지를 표현해보세요.");
+//        } else if (theme.contains("자연") || theme.contains("풍경")) {
+//            description.append("자연의 아름다움을 통해 내면의 평안을 찾아보세요.");
+//        } else if (theme.contains("가족") || theme.contains("친구")) {
+//            description.append("소중한 사람들과의 관계를 따뜻하게 표현해보세요.");
+//        } else {
+//            description.append("자신만의 독특한 시각과 감성으로 자유롭게 표현해보세요.");
+//        }
+//
+//        // 현재 감정 상태에 따른 추가 안내
+//        switch (emotionalState.getPrimaryEmotion()) {
+//            case "SADNESS" -> description.append(" 지금 시기에는 따뜻한 색감과 부드러운 선을 사용하는 것이 도움이 될 것 같아요.");
+//            case "ANXIETY" -> description.append(" 마음이 진정될 수 있도록 규칙적인 패턴이나 대칭적 구성을 시도해보세요.");
+//            case "ANGER" -> description.append(" 강한 감정을 건설적으로 표현할 수 있도록 다이내믹한 선과 대비를 활용해보세요.");
+//            case "HAPPINESS" -> description.append(" 지금의 긍정적 에너지를 마음께 표현하며, 새로운 기법에도 도전해보세요.");
+//        }
+
+//        return description.toString();
+        return theme;
     }
 
     public CoachingResponse getPersonalizedGuidance(String userId) {
@@ -196,10 +218,10 @@ public class AutonomousCoachingService {
         AgentDecision decision = agentService.makeAutonomousDecision(userId, latestState);
         String personalizedMessage = agentService.generatePersonalizedMessage(userId, decision, latestState);
         List<String> recommendations = profileService.getRecommendations(userId);
-        
+
         // 케어 상태 평가
         CareStatus careStatus = careStatusService.assessCareStatus(userId, latestState, profile);
-        
+
         // 추가 정보 생성
         String aiAdvice = generateAIAdvice(latestState, careStatus, null);
         List<String> recommendedActivities = generateRecommendedActivities(latestState, careStatus);

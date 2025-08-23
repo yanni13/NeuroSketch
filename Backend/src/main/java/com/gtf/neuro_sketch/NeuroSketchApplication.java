@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class NeuroSketchApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(NeuroSketchApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(NeuroSketchApplication.class, args);
+    }
 
 }
