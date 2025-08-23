@@ -8,7 +8,7 @@
 import Foundation
 
 
-//TODO: 수정 필요
+// TODO: 수정 필요
 struct ImageAnalysisRequestDto: Codable {
     let imageData: Data
     let analysisType: String

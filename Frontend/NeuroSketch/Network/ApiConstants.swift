@@ -7,7 +7,7 @@
 
 import Foundation
 
-//TODO: 수정 필요
+// TODO: 수정 필요
 struct ApiConstants {
     static let baseUrl = URL(string: "https://api.example.com")!
     static let imageAnalysisPath = "/api/v1/image/analyze"
