@@ -7,6 +7,91 @@
 
 import SwiftUI
 
+struct ResultView: View {
+    @State private var showSuccessPopUp = false
+    @Binding var navigationPath: NavigationPath
+    
+    var body: some View {
+        ZStack {
+            VStack {
+                // 말풍선
+                ZStack {
+                    Image("SpeechBallon")
+                        .resizable()
+                        .frame(maxWidth: 300, maxHeight: 100)
+                        .shadow(radius: 10)
+                    
+                    Text("응원 메시지")
+                        .multilineTextAlignment(.center)
+                        .offset(y: -10)
+                }
+                
+                Rectangle()
+                    .frame(width: 300, height: 300)
+                
+                Spacer().frame(height: 40)
+                
+                Text("새싹")
+                    .padding(3)
+                
+                Spacer().frame(height: 12)
+                
+                Text("분석내용분석내용분석내용")
+                    .padding(3)
+                
+                Spacer().frame(height: 40)
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("할 일")
+                        .multilineTextAlignment(.leading)
+                    
+                    CheckListButton(
+                        text: "산책하기"
+                    ) { isCompleted in
+                        if isCompleted {
+                            showSuccessPopUp = true
+                        }
+                    }
+                }
+            }
+            .padding(.bottom, 20)
+            .padding(.horizontal, 24)
+            
+            if showSuccessPopUp {
+                Color.black.opacity(0.35)
+                    .ignoresSafeArea()
+                
+                SuccessPopUpView(showPopUp: $showSuccessPopUp, navigationPath: $navigationPath)
+            }
+        }
+        .navigationBarBackButtonHidden()
+        .navigationTitle("분석결과")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    if !navigationPath.isEmpty {
+                        navigationPath.removeLast()
+                    }
+
+                }, label: {
+                    Image(systemName: "chevron.left")
+                        .foregroundStyle(.black)
+                })
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    navigationPath = NavigationPath()
+                }, label: {
+                    Image(systemName: "house.fill")
+                        .foregroundStyle(.black)
+                })
+            }
+        }
+    }
+}
+
 struct Triangle: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
@@ -18,72 +103,3 @@ struct Triangle: Shape {
     }
 }
 
-struct ResultView: View {
-    var body: some View {
-        VStack {
-            // 말풍선
-            ZStack {
-                Image("SpeechBallon")
-                    .resizable()
-                    .frame(maxWidth: 300, maxHeight: 100)
-                    .shadow(radius: 10)
-                
-                Text("응원 메시지")
-                    .multilineTextAlignment(.center)
-                    .offset(y: -10)
-            }
-            
-            Rectangle()
-                .frame(width: 300, height: 300)
-            
-            Spacer().frame(height: 40)
-
-            Text("새싹")
-                .padding(3)
-            
-            Spacer().frame(height: 12)
-            
-            Text("분석내용분석내용분석내용")
-                .padding(3)
-            
-            Spacer().frame(height: 40)
-            
-            VStack(alignment: .leading, spacing: 12) {
-                Text("할 일")
-                    .multilineTextAlignment(.leading)
-                
-                CheckListButton(
-                    text: "산책하기"
-                ) {
-                    
-                }
-            }
-        }
-        .padding(.bottom, 20)
-        .padding(.horizontal, 24)
-        .navigationBarBackButtonHidden()
-        .navigationTitle("분석결과")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                }, label: {
-                    Image(systemName: "chevron.left")
-                        .foregroundStyle(.black)
-                })
-            }
-            
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                }, label: {
-                    Image(systemName: "house.fill")
-                        .foregroundStyle(.black)
-                })
-            }
-        }
-    }
-}
-
-#Preview {
-    ResultView()
-}
