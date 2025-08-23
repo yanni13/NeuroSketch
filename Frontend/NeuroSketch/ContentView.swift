@@ -8,14 +8,20 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var isDrawing: Bool = false
+    
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Button(action: {
+                isDrawing = true
+            }, label: {
+                Text("그림 그리기")
+            })
         }
         .padding()
+        .fullScreenCover(isPresented: $isDrawing) {
+            DrawingView()
+        }
     }
 }
 
