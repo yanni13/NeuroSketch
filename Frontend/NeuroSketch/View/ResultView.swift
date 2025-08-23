@@ -61,7 +61,7 @@ struct ResultView: View {
                 Color.black.opacity(0.35)
                     .ignoresSafeArea()
                 
-                SuccessPopUpView(showPopUp: $showSuccessPopUp)
+                SuccessPopUpView(showPopUp: $showSuccessPopUp, navigationPath: $navigationPath)
             }
         }
         .navigationBarBackButtonHidden()
@@ -73,6 +73,7 @@ struct ResultView: View {
                     if !navigationPath.isEmpty {
                         navigationPath.removeLast()
                     }
+
                 }, label: {
                     Image(systemName: "chevron.left")
                         .foregroundStyle(.black)
@@ -81,7 +82,7 @@ struct ResultView: View {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
-                    navigationPath.removeLast(2)
+                    navigationPath = NavigationPath()
                 }, label: {
                     Image(systemName: "house.fill")
                         .foregroundStyle(.black)

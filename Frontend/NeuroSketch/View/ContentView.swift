@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var selectedTab = 0
     @State private var path = NavigationPath()
+    @State private var showSuccessPopUp = false
     
     var body: some View {
         ZStack {
@@ -61,7 +62,9 @@ struct ContentView: View {
                         CheckListButton(
                             text: "생성전TodoList"
                         ) { isCompleted in
-                            // ContentView에서의 액션
+                            if isCompleted {
+                                showSuccessPopUp = true
+                            }
                         }
                         .padding(.bottom, 65)
                     }
@@ -118,6 +121,14 @@ struct ContentView: View {
                 }
             }
             .padding(.bottom, 55)
+        }
+        
+        // 팝업 오버레이
+        if showSuccessPopUp {
+            Color.black.opacity(0.35)
+                .ignoresSafeArea()
+            
+            SuccessPopUpView(showPopUp: $showSuccessPopUp, navigationPath: $path)
         }
         }
     }

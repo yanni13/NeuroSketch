@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SuccessPopUpView: View {
     @Binding var showPopUp: Bool
+    @Binding var navigationPath: NavigationPath
     
     var body: some View {
         VStack {
@@ -39,7 +40,8 @@ struct SuccessPopUpView: View {
             Spacer().frame(height: 12)
 
             Button(action: {
-                
+                showPopUp = false
+                navigationPath.append("drawing")
             }, label: {
                 ZStack {
                     Rectangle()

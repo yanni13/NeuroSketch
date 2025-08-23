@@ -47,7 +47,7 @@ struct DrawingView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    presentationMode.wrappedValue.dismiss()
+                    navigationPath = NavigationPath()
                 }, label: {
                     Image(systemName: "chevron.left")
                         .foregroundStyle(.black)
