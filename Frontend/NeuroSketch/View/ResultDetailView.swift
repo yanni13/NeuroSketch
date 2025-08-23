@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ResultDetailView: View {
     @Environment(\.dismiss) var dismiss
+    @Binding var navigationPath: NavigationPath
     
     var body: some View {
         ScrollView {
@@ -100,7 +101,7 @@ struct ResultDetailView: View {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
-                    // 메인화면으로
+                    navigationPath = NavigationPath()
                 }, label: {
                     Image("home")
                         .resizable()
@@ -111,8 +112,4 @@ struct ResultDetailView: View {
             }
         }
     }
-}
-
-#Preview {
-    ResultDetailView()
 }

@@ -89,7 +89,7 @@ struct ContentView: View {
                         case "analysis":
                             ImageAnalysisView(navigationPath: $path)
                         case "detailView":
-                            ResultDetailView()
+                            ResultDetailView(navigationPath: $path)
                         default:
                             ContentView()
                         }
@@ -101,7 +101,6 @@ struct ContentView: View {
                         .frame(width: 24, height: 24)
 
                     Text("홈")
-
                 }
                 .tag(0)
 
