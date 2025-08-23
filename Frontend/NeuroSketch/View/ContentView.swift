@@ -94,7 +94,7 @@ struct ContentView: View {
                         case "drawing":
                             DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                         case "result":
-                            ResultView(navigationPath: $path)
+                            ResultView(navigationPath: $path, drawingViewModel: drawingViewModel)
                         case "mainView":
                             ContentView()
                         case "analysis":
@@ -235,7 +235,7 @@ struct ContentView: View {
                 case "drawing":
                     DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                 case "result":
-                    ResultView(navigationPath: $path)
+                    ResultView(navigationPath: $path, drawingViewModel: drawingViewModel)
                 case "mainView":
                     ContentView()
                 case "analysis":

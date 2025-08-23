@@ -77,7 +77,7 @@ struct AnalysisSection: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 18)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
-                .background(Color(red: 0.89, green: 0.99, blue: 0.95))
+                .background(Color("green01"))
                 .cornerRadius(16)
         }
         .padding(.horizontal, 24)

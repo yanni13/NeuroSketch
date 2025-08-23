@@ -19,8 +19,8 @@ struct ResultDetailView: View {
             VStack {
                 HStack(alignment: .top, spacing: 14) {
                     if let analysisResult = drawingViewModel.analysisResult {
-                        let koreanEmotion = getKoreanEmotion(for: analysisResult.analyzedEmotion.primaryEmotion)
-                        FlexibleEmotionCard(emoji: getEmotionEmoji(for: koreanEmotion), emotion: koreanEmotion)
+                        let koreanEmotion = EmotionUtils.getKoreanEmotion(for: analysisResult.analyzedEmotion.primaryEmotion)
+                        FlexibleEmotionCard(emoji: EmotionUtils.getEmotionEmoji(for: koreanEmotion), emotion: koreanEmotion)
                     }
                     
                     if let analysisResult = drawingViewModel.analysisResult {
@@ -40,38 +40,16 @@ struct ResultDetailView: View {
             AnalysisSection(icon: "accentIcon", title: "그림 분석") {
                 VStack(alignment: .leading, spacing: 14) {
                     if let analysisResult = drawingViewModel.analysisResult,
-                       let firstObject = analysisResult.imageAnalysis.objectDetails.first {
-                        CategoryHeader(itemName: firstObject.objectName, categoryType: firstObject.position.location)
-                    } else {
-                        CategoryHeader(itemName: "요소", categoryType: "위치")
-                    }
-                    
-                    HStack {
-                        if let analysisResult = drawingViewModel.analysisResult,
-                           let firstObject = analysisResult.imageAnalysis.objectDetails.first {
-                            AnalysisTag(title: "크기", value: firstObject.position.relativeSize)
-                            AnalysisTag(title: "색상", value: firstObject.visualCharacteristics.colors.first ?? "색상 없음")
-                            AnalysisTag(title: "선 스타일", value: firstObject.visualCharacteristics.lineStyle)
+                       !analysisResult.imageAnalysis.objectDetails.isEmpty {
+                        // 각 객체마다 ObjectAnalysisCard 표시
+                        ForEach(Array(analysisResult.imageAnalysis.objectDetails.enumerated()), id: \.offset) { index, object in
+                            ObjectAnalysisCard(object: object)
+                            
+                            if index < analysisResult.imageAnalysis.objectDetails.count - 1 {
+                                Spacer().frame(height: 20)
+                            }
                         }
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("🧠")
-                            Text("심리학적 의미")
-                        }
-                        
-                        if let analysisResult = drawingViewModel.analysisResult,
-                           let firstObject = analysisResult.imageAnalysis.objectDetails.first {
-                            Text(firstObject.symbolicIndicators.artTherapySignificance)
-                        } else {
-                            Text("분석 데이터를 불러오는 중입니다...")
-                        }
-                    }
-                    .padding(14)
-                    .frame(width: 317, alignment: .topLeading)
-                    .background(.white)
-                    .cornerRadius(14)
+                    } 
                 }
             }
             
@@ -135,49 +113,6 @@ struct ResultDetailView: View {
     }
     
     // MARK: - Helper Functions
-    private func getEmotionEmoji(for emotion: String) -> String {
-        switch emotion.lowercased() {
-        case "기쁨", "행복", "joy", "happiness":
-            return "😊"
-        case "분노", "화남", "anger":
-            return "😡"
-        case "슬픔", "sadness":
-            return "😢"
-        case "두려움", "fear":
-            return "😨"
-        case "놀람", "surprise":
-            return "😮"
-        case "혐오", "disgust":
-            return "🤢"
-        case "평온", "calm", "peace":
-            return "😌"
-        default:
-            return "😐"
-        }
-    }
-    
-    private func getKoreanEmotion(for emotion: String) -> String {
-        switch emotion.uppercased() {
-        case "PEACE":
-            return "평온"
-        case "ANGER":
-            return "분노"
-        case "JOY", "HAPPINESS":
-            return "기쁨"
-        case "SADNESS":
-            return "슬픔"
-        case "FEAR":
-            return "두려움"
-        case "SURPRISE":
-            return "놀람"
-        case "DISGUST":
-            return "혐오"
-        case "CALM":
-            return "평온"
-        default:
-            return emotion // 이미 한국어인 경우 그대로 반환
-        }
-    }
     
     private func getStatusBackgroundColor(for statusText: String) -> Color {
         switch statusText {
@@ -247,9 +182,9 @@ struct FlexibleStatusIndicatorCard: View {
         case 0...4:
             return 23
         case 5...8:
-            return 30
+            return 23
         default:
-            return 40
+            return 23
         }
     }
     
@@ -260,7 +195,7 @@ struct FlexibleStatusIndicatorCard: View {
         case 5...8:
             return 10
         default:
-            return 12
+            return 10
         }
     }
     
@@ -276,7 +211,7 @@ struct FlexibleStatusIndicatorCard: View {
                     .foregroundStyle(indicatorColor)
                 
                 Text(statusText)
-                    .lineLimit(3)
+//                    .lineLimit(3)
                     .multilineTextAlignment(.center)
                     .font(.system(size: 12, weight: .medium))
                     .fixedSize(horizontal: false, vertical: true)
