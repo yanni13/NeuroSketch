@@ -5,13 +5,15 @@
 //  Created by 최희진 on 8/23/25.
 //
 
-import SwiftUI
 import Lottie
+import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab = 0
     @State private var path = NavigationPath()
     @State private var showSuccessPopUp = false
+    @StateObject private var drawingViewModel = DrawingViewModel()
+    @EnvironmentObject var appState: AppState
     
     var body: some View {
         ZStack {
@@ -28,39 +30,41 @@ struct ContentView: View {
                             }) {
                                 Image(systemName: "square.and.pencil")
                                     .resizable()
-                                    .frame(width: 20, height: 20)
+                                    .frame(width: 24, height: 24)
                                     .foregroundColor(.black)
                                     .padding(4)
                             }
+                            .contentShape(Rectangle())
                         }
                         .padding(.top, 8)
-                        
+
                         Spacer().frame(height: 12)
-                        
+
                         HStack {
                             Text("그림을 그려 화분을 채워주세요")
                                 .font(.title2)
                                 .lineLimit(34)
                             Spacer()
                         }
-                        
+
                         Spacer()
-                        
+
                         LottieComponent()
                             .frame(width: 166, height: 137)
-                        
+                            .allowsHitTesting(false)
+
                         Spacer()
-                        
+
                         VStack(alignment: .leading) {
                             Text("할 일")
                                 .foregroundStyle(.black)
                                 .multilineTextAlignment(.leading)
-                            
+
                             Spacer().frame(height: 12)
-                            
+
                             // 체크리스트 버튼
                             CheckListButton(
-                                text: "생성전TodoList"
+                                text: "생성전TodoList", isCompleted: false, showIcon: false
                             ) { isCompleted in
                                 if isCompleted {
                                     showSuccessPopUp = true
@@ -79,11 +83,15 @@ struct ContentView: View {
                     .navigationDestination(for: String.self) { route in
                         switch route {
                         case "drawing":
-                            DrawingView(navigationPath: $path)
+                            DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                         case "result":
                             ResultView(navigationPath: $path)
                         case "mainView":
                             ContentView()
+                        case "analysis":
+                            ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
+                        case "detailView":
+                            ResultDetailView(navigationPath: $path)
                         default:
                             ContentView()
                         }
@@ -93,13 +101,12 @@ struct ContentView: View {
                     Image(systemName: "house")
                         .resizable()
                         .frame(width: 24, height: 24)
-                    
+
                     Text("홈")
-                    
                 }
                 .tag(0)
-                
-                Text("아카이브")
+
+                archiveTapBar
                     .tabItem {
                         Image(systemName: "tray")
                             .resizable()
@@ -109,30 +116,103 @@ struct ContentView: View {
                     .tag(1)
             }
             .tint(Color("green02"))
-            
+
             // 인디케이터
-            VStack {
-                Spacer()
-                HStack {
-                    ForEach(0..<2, id: \.self) { index in
-                        Rectangle()
-                            .fill(selectedTab == index ? Color("green02") : Color.clear)
-                            .frame(height: 3)
+            if path.isEmpty {
+                VStack {
+                    Spacer()
+                    HStack {
+                        ForEach(0..<2, id: \.self) { index in
+                            Rectangle()
+                                .fill(
+                                    selectedTab == index
+                                    ? Color("green02") : Color.clear
+                                )
+                                .frame(height: 3)
+                        }
                     }
+                    .padding(.bottom, 55)
                 }
-                .padding(.bottom, 55)
             }
             
             // 팝업 오버레이
             if showSuccessPopUp {
                 Color.black.opacity(0.35)
                     .ignoresSafeArea()
-                
-                SuccessPopUpView(showPopUp: $showSuccessPopUp, navigationPath: $path)
+
+                SuccessPopUpView(
+                    showPopUp: $showSuccessPopUp,
+                    navigationPath: $path
+                )
             }
         }
         .onAppear{
-            UserDefaults.standard.set(UUID().uuidString, forKey: "uid")
+            if ((UserDefaults.standard.string(forKey: "uid")?.isEmpty) != nil) {
+                appState.isLoggedIn = true
+            }
+        }
+    }
+    
+    private var archiveTapBar: some View{
+        NavigationStack(path: $path) {
+            // 커스텀 헤더
+            VStack{
+                HStack {
+                    Text("NeuroSketch")
+                        .font(.title3)
+                    Spacer()
+                    Button(action: {
+                        path.append("drawing")
+                    }) {
+                        Image(systemName: "square.and.pencil")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(.black)
+                            .padding(4)
+                    }
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+                }
+                .padding(.top, 8)
+                .padding(.horizontal, 24)
+                
+                VStack(alignment: .leading, spacing: 40){
+                    VStack(alignment: .leading, spacing: 12){
+                        Text("할 일")
+                        
+                        CheckListButton(text: "산책하기", isCompleted: false, showIcon: true, action: { isCompleted in
+                            path.append("result")
+                        })
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 12){
+                        Text("완료한 일")
+                        
+                        CheckListButton(text: "산책하기", isCompleted: true, showIcon: true, action: { isCompleted in
+                            path.append("result")
+                        })
+                    }
+                    
+                    Spacer()
+                }
+                .padding(.top, 30)
+                .padding(.horizontal, 24)
+            }
+            .navigationBarHidden(true)
+            .navigationDestination(for: String.self) { route in
+                switch route {
+                case "drawing":
+                    DrawingView(viewModel: drawingViewModel, navigationPath: $path)
+                case "result":
+                    ResultView(navigationPath: $path)
+                case "mainView":
+                    ContentView()
+                case "analysis":
+                    ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
+                default:
+                    ContentView()
+                }
+            }
         }
     }
 }

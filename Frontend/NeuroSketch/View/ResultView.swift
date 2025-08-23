@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ResultView: View {
     @State private var showSuccessPopUp = false
+    @State private var showDetailView = false
     @Binding var navigationPath: NavigationPath
     
     var body: some View {
@@ -19,20 +20,19 @@ struct ResultView: View {
                     Image("SpeechBallon")
                         .resizable()
                         .frame(maxWidth: 300, maxHeight: 100)
-                        .shadow(radius: 10)
+                        .shadow(radius: 2)
                     
                     Text("응원 메시지")
                         .multilineTextAlignment(.center)
                         .offset(y: -10)
                 }
+                .offset(y: -60)
                 
-//
                 LottieComponent()
                     .frame(width: 166, height: 137)
+                
+                Spacer().frame(height: 60)
 
-                
-                Spacer().frame(height: 40)
-                
                 Text("새싹")
                     .padding(3)
                 
@@ -48,7 +48,7 @@ struct ResultView: View {
                         .multilineTextAlignment(.leading)
                     
                     CheckListButton(
-                        text: "산책하기"
+                        text: "산책하기", isCompleted: false, showIcon: false
                     ) { isCompleted in
                         if isCompleted {
                             showSuccessPopUp = true
@@ -69,12 +69,11 @@ struct ResultView: View {
         .navigationBarBackButtonHidden()
         .navigationTitle("분석결과")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    if !navigationPath.isEmpty {
-                        navigationPath.removeLast()
-                    }
+                    navigationPath = NavigationPath()
 
                 }, label: {
                     Image(systemName: "chevron.left")
@@ -84,9 +83,10 @@ struct ResultView: View {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
-                    navigationPath = NavigationPath()
+//                    showDetailView = true
+                    navigationPath.append("detailView")
                 }, label: {
-                    Image(systemName: "house.fill")
+                    Image(systemName: "info.circle")
                         .foregroundStyle(.black)
                 })
             }
