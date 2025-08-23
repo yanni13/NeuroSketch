@@ -86,8 +86,11 @@ struct ContentView: View {
                     }
                     .onAppear{
                         isFirstTodoCompleted = false
-                        contentViewModel.fetchTodoList()
-                        firstTodoTopic = contentViewModel.pendingTodos.first?.activity ?? "분석 결과에 따라 할 일을 추천해드려요"
+                        contentViewModel.fetchTodoList(){ success in
+                            if success {
+                                firstTodoTopic = contentViewModel.pendingTodos.first?.activity ?? "분석 결과에 따라 할 일을 추천해드려요"
+                            }
+                        }
                     }
                     .padding(.horizontal, 24)
                     .frame(

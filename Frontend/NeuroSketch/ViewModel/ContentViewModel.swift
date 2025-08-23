@@ -20,7 +20,7 @@ class ContentViewModel: ObservableObject {
         return todoItems.filter { $0.isDone }
     }
     
-    func fetchTodoList() {
+    func fetchTodoList(completion: @escaping (Bool) -> Void) {
         guard let uid = UserDefaults.standard.string(forKey: "uid"), !uid.isEmpty else {
             print("UID가 없습니다.")
             return
@@ -35,13 +35,14 @@ class ContentViewModel: ObservableObject {
                 
                 switch result {
                 case .success(let response):
-//                    print("투두리스트 조회 성공: \(response.todos.count)개")
                     self?.todoItems = response
                     self?.errorMessage = nil
+                    completion(true)
                 case .failure(let error):
                     print("투두리스트 조회 실패: \(error)")
                     self?.errorMessage = error.localizedDescription
                     self?.todoItems = []
+                    completion(false)
                 }
             }
         }
@@ -59,7 +60,11 @@ class ContentViewModel: ObservableObject {
                 switch result {
                 case .success:
                     print("투두 완료 처리 성공")
-                    self?.fetchTodoList() // 목록 새로고침
+                    self?.fetchTodoList(){ success in
+                        if success{
+                            print("투두 리스트 재조회 성공")
+                        }
+                    } // 목록 새로고침
                     completion(true)
                 case .failure(let error):
                     print("투두 완료 API 호출 실패: \(error)")
