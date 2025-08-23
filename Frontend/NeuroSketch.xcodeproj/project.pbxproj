@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4683F3282E59854D00E96A32 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 4683F3272E59854D00E96A32 /* Alamofire */; };
-		46851A9D2E5A1DE400C5D003 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 46851A9C2E5A1DE400C5D003 /* Lottie */; };
+		D82D337D2E59E4170001E0B7 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = D82D337C2E59E4170001E0B7 /* Lottie */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,7 +42,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4683F3282E59854D00E96A32 /* Alamofire in Frameworks */,
-				46851A9D2E5A1DE400C5D003 /* Lottie in Frameworks */,
+				D82D337D2E59E4170001E0B7 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,7 +86,7 @@
 			name = NeuroSketch;
 			packageProductDependencies = (
 				4683F3272E59854D00E96A32 /* Alamofire */,
-				46851A9C2E5A1DE400C5D003 /* Lottie */,
+				D82D337C2E59E4170001E0B7 /* Lottie */,
 			);
 			productName = NeuroSketch;
 			productReference = 4683F2532E595B6400E96A32 /* NeuroSketch.app */;
@@ -118,7 +118,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				4683F3262E59854D00E96A32 /* XCRemoteSwiftPackageReference "Alamofire" */,
-				46851A9B2E5A1DE400C5D003 /* XCRemoteSwiftPackageReference "lottie-spm" */,
+				D82D337B2E59E4170001E0B7 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4683F2542E595B6400E96A32 /* Products */;
@@ -278,7 +278,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"NeuroSketch/Resource/Preview Content\"";
-				DEVELOPMENT_TEAM = Q8UK3SWSPM;
+				DEVELOPMENT_TEAM = W5Z68U98HJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NeuroSketch/Info.plist;
@@ -289,7 +289,6 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -315,7 +314,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"NeuroSketch/Resource/Preview Content\"";
-				DEVELOPMENT_TEAM = Q8UK3SWSPM;
+				DEVELOPMENT_TEAM = W5Z68U98HJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NeuroSketch/Info.plist;
@@ -326,7 +325,6 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -376,7 +374,7 @@
 				minimumVersion = 5.10.2;
 			};
 		};
-		46851A9B2E5A1DE400C5D003 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+		D82D337B2E59E4170001E0B7 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
 			requirement = {
@@ -392,9 +390,9 @@
 			package = 4683F3262E59854D00E96A32 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
-		46851A9C2E5A1DE400C5D003 /* Lottie */ = {
+		D82D337C2E59E4170001E0B7 /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 46851A9B2E5A1DE400C5D003 /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			package = D82D337B2E59E4170001E0B7 /* XCRemoteSwiftPackageReference "lottie-spm" */;
 			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */

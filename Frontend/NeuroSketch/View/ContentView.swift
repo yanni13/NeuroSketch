@@ -30,11 +30,10 @@ struct ContentView: View {
                             }) {
                                 Image(systemName: "square.and.pencil")
                                     .resizable()
-                                    .frame(width: 20, height: 20)
+                                    .frame(width: 24, height: 24)
                                     .foregroundColor(.black)
                                     .padding(4)
                             }
-                            .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
                         }
                         .padding(.top, 8)
@@ -91,6 +90,8 @@ struct ContentView: View {
                             ContentView()
                         case "analysis":
                             ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
+                        case "detailView":
+                            ResultDetailView(navigationPath: $path)
                         default:
                             ContentView()
                         }
@@ -102,7 +103,6 @@ struct ContentView: View {
                         .frame(width: 24, height: 24)
 
                     Text("홈")
-
                 }
                 .tag(0)
 
