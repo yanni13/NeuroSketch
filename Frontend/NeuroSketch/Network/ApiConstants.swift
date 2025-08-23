@@ -9,7 +9,7 @@ import Foundation
 
 // TODO: 수정 필요
 struct ApiConstants {
-    static let baseUrl = URL(string: "https://api.example.com")!
-    static let imageAnalysisPath = "/api/v1/image/analyze"
+    static let baseUrl = URL(string: "https://.ngrok-free.app")!
+    static let imageAnalysisPath = "/api/coaching/analyze"
     static let userSignupPath = "/api/v1/user/signup"
 }

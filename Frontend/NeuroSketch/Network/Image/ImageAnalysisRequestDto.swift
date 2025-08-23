@@ -8,13 +8,7 @@
 import Foundation
 
 
-// TODO: 수정 필요
-struct ImageAnalysisRequestDto: Codable {
-    let imageData: Data
-    let analysisType: String
-    
-    enum CodingKeys: String, CodingKey {
-        case imageData = "image_data"
-        case analysisType = "analysis_type"
-    }
+struct ImageAnalysisRequestDto {
+    let userId: String
+    let file: Data
 }

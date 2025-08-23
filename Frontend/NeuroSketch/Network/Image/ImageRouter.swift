@@ -12,36 +12,36 @@ import Alamofire
 /// Image 분석 API 요청을 위한 라우터(enum)
 enum ImageRouter: URLRequestConvertible {
     case analyzeImage(request: ImageAnalysisRequestDto)
-
+    
     var baseURL: URL {
-        switch self {
-        case .analyzeImage:
-            return ApiConstants.baseUrl
-        }
+        return ApiConstants.baseUrl
     }
-
+    
     var method: HTTPMethod {
         return .post
     }
     
     var path: String {
-        switch self {
-        case .analyzeImage(_):
-            return ApiConstants.imageAnalysisPath
-        }
+        return ApiConstants.imageAnalysisPath
     }
-
+    
     func asURLRequest() throws -> URLRequest {
-        let url = baseURL.appendingPathComponent(path)
-        var request = try URLRequest(url: url, method: method)
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
+        
         switch self {
-        case let .analyzeImage(requestDto):
-            let data = try JSONEncoder().encode(requestDto)
-            request.httpBody = data
+        case .analyzeImage(let request):
+            components.queryItems = [
+                URLQueryItem(name: "userId", value: request.userId)
+            ]
         }
-
-        return request
+        
+        guard let url = components.url else {
+            throw AFError.invalidURL(url: baseURL)
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.method = method
+        
+        return urlRequest
     }
 }

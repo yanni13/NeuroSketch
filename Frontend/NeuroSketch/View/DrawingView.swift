@@ -57,13 +57,10 @@ struct DrawingView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     
-                    saveDrawingToPhotos()
-                    navigationPath.append("result")
-                    
                     viewModel.analyzeDrawing(drawing) { success in
                         if success {
-//                            saveDrawingToPhotos()
-//                            navigationPath.append("result")
+                            navigationPath.append("result")
+                            //TODO: 분석 화면 이동 구현
                         }
                     }
                 }, label: {
