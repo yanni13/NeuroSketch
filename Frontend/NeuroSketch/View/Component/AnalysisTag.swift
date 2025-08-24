@@ -16,7 +16,9 @@ struct AnalysisTag: View {
         HStack(alignment: .center, spacing: 10) {
             VStack(spacing: 8) {
                 Text(title)
+                    .foregroundStyle(.gray01)
                 Text(value)
+                    .fontWeight(.semibold)
             }
         }
         .padding(.horizontal, 16)

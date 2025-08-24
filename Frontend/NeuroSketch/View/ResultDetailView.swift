@@ -166,6 +166,7 @@ struct FlexibleEmotionCard: View {
         StatusCard(title: "현재 감정") {
             HStack {
                 Text(emoji)
+                    .font(.system(size: 38))
                 Text(emotion)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
