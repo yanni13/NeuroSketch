@@ -12,7 +12,7 @@ class DrawingViewModel: ObservableObject {
     @Published var isAnalyzing = false//분석 중인지 여부
     @Published var drawing = PKDrawing()
     @Published var analysisResult: DrawingAnalysisModel?//분석 완료 후 데이터
-    @Published var nextTopic: String = "나무와 집을 그려보세요"//다음 그리기 주제
+    @Published var nextTopic: String = "나무와 집"//다음 그리기 주제
     
     func analyzeDrawing(completion: @escaping (Bool) -> Void) {
         guard let image = drawing.asImage(size: UIScreen.main.bounds.size),
@@ -43,6 +43,12 @@ class DrawingViewModel: ObservableObject {
                 case .success(let dto):
                     print("Image analysis request sent successfully")
                     self?.analysisResult = DrawingAnalysisModel(from: dto)
+                    
+                    // SwiftData에 저장
+                    Task { @MainActor in
+                        DrawingAnalysisStorage.shared.saveAnalysisResult(dto, userId: userId)
+                    }
+                    
                     completion(true)
                 case .failure(let error):
                     print("Image analysis failed: \(error)")
