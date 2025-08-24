@@ -12,6 +12,7 @@ class DrawingViewModel: ObservableObject {
     @Published var isAnalyzing = false//분석 중인지 여부
     @Published var drawing = PKDrawing()
     @Published var analysisResult: DrawingAnalysisModel?//분석 완료 후 데이터
+    @Published var nextTopic: String = "나무와 집을 그려보세요"//다음 그리기 주제
     
     func analyzeDrawing(completion: @escaping (Bool) -> Void) {
         guard let image = drawing.asImage(size: UIScreen.main.bounds.size),
@@ -47,6 +48,26 @@ class DrawingViewModel: ObservableObject {
                     print("Image analysis failed: \(error)")
                     self?.analysisResult = nil
                     completion(false)
+                }
+            }
+        }
+    }
+    
+    func fetchNextTopic() {
+        guard let uid = UserDefaults.standard.string(forKey: "uid"), !uid.isEmpty else {
+            print("UID가 없습니다.")
+            return
+        }
+        
+        CoachingService.shared.fetchNextTopic(uid: uid) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    print("다음 주제 조회 성공: \(response.content)")
+                    self?.nextTopic = response.content
+                case .failure(let error):
+                    print("다음 주제 조회 실패: \(error)")
+                    // 실패 시 기본값 유지
                 }
             }
         }

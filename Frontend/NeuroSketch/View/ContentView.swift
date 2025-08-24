@@ -12,8 +12,12 @@ struct ContentView: View {
     @State private var selectedTab = 0
     @State private var path = NavigationPath()
     @State private var showSuccessPopUp = false
+    @State private var isFirstTodoCompleted = false
     @StateObject private var drawingViewModel = DrawingViewModel()
+    @StateObject private var contentViewModel = ContentViewModel()
     @EnvironmentObject var appState: AppState
+    
+    @State private var firstTodoTopic = ""
     
     var body: some View {
         ZStack {
@@ -22,9 +26,12 @@ struct ContentView: View {
                     VStack {
                         // 커스텀 헤더
                         HStack {
-                            Text("NeuroSketch")
-                                .font(.title3)
+                            Image("neuroSketchIcon")
+                                .resizable()
+                                .frame(width: 146, height: 34)
+
                             Spacer()
+                            
                             Button(action: {
                                 path.append("drawing")
                             }) {
@@ -47,7 +54,7 @@ struct ContentView: View {
                             Spacer()
                         }
 
-                        Spacer()
+                        Spacer().frame(height: 218)
 
                         LottieComponent()
                             .frame(width: 166, height: 137)
@@ -64,13 +71,28 @@ struct ContentView: View {
 
                             // 체크리스트 버튼
                             CheckListButton(
-                                text: "생성전TodoList", isCompleted: false, showIcon: false
-                            ) { isCompleted in
-                                if isCompleted {
-                                    showSuccessPopUp = true
+                                text: firstTodoTopic,
+                                isCompleted: $isFirstTodoCompleted,
+                                showIcon: false
+                            ) {
+                                if let firstTodo = contentViewModel.pendingTodos.first {
+                                    contentViewModel.completeTodo(todoId: firstTodo.id) { success in
+                                        if success {
+                                            showSuccessPopUp = true
+                                            isFirstTodoCompleted.toggle()
+                                        }
+                                    }
                                 }
                             }
                             .padding(.bottom, 65)
+                        }
+                    }
+                    .onAppear{
+                        isFirstTodoCompleted = false
+                        contentViewModel.fetchTodoList(){ success in
+                            if success {
+                                firstTodoTopic = contentViewModel.pendingTodos.first?.activity ?? "분석 결과에 따라 할 일을 추천해드려요"
+                            }
                         }
                     }
                     .padding(.horizontal, 24)
@@ -85,13 +107,13 @@ struct ContentView: View {
                         case "drawing":
                             DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                         case "result":
-                            ResultView(navigationPath: $path)
+                            ResultView(navigationPath: $path, drawingViewModel: drawingViewModel)
                         case "mainView":
                             ContentView()
                         case "analysis":
                             ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
                         case "detailView":
-                            ResultDetailView(navigationPath: $path)
+                            ResultDetailView(navigationPath: $path, drawingViewModel: drawingViewModel)
                         default:
                             ContentView()
                         }
@@ -105,7 +127,7 @@ struct ContentView: View {
                     Text("홈")
                 }
                 .tag(0)
-
+                
                 archiveTapBar
                     .tabItem {
                         Image(systemName: "tray")
@@ -131,7 +153,7 @@ struct ContentView: View {
                                 .frame(height: 3)
                         }
                     }
-                    .padding(.bottom, 55)
+                    .padding(.bottom, 48)
                 }
             }
             
@@ -156,7 +178,7 @@ struct ContentView: View {
     private var archiveTapBar: some View{
         NavigationStack(path: $path) {
             // 커스텀 헤더
-            VStack{
+            ScrollView{
                 HStack {
                     Text("NeuroSketch")
                         .font(.title3)
@@ -177,20 +199,38 @@ struct ContentView: View {
                 .padding(.horizontal, 24)
                 
                 VStack(alignment: .leading, spacing: 40){
-                    VStack(alignment: .leading, spacing: 12){
-                        Text("할 일")
-                        
-                        CheckListButton(text: "산책하기", isCompleted: false, showIcon: true, action: { isCompleted in
-                            path.append("result")
-                        })
+                    if !contentViewModel.pendingTodos.isEmpty {
+                        VStack(alignment: .leading, spacing: 12){
+                            Text("할 일")
+                            
+                            ForEach(contentViewModel.pendingTodos, id: \.id) { todo in
+                                CheckListButton(
+                                    text: todo.activity,
+                                    isCompleted: .constant(false),
+                                    showIcon: true,
+                                    action: {
+                                        path.append("result")
+                                    }
+                                )
+                            }
+                        }
                     }
                     
-                    VStack(alignment: .leading, spacing: 12){
-                        Text("완료한 일")
-                        
-                        CheckListButton(text: "산책하기", isCompleted: true, showIcon: true, action: { isCompleted in
-                            path.append("result")
-                        })
+                    if !contentViewModel.completedTodos.isEmpty {
+                        VStack(alignment: .leading, spacing: 12){
+                            Text("완료한 일")
+                            
+                            ForEach(contentViewModel.completedTodos, id: \.id) { todo in
+                                CheckListButton(
+                                    text: todo.activity,
+                                    isCompleted: .constant(true),
+                                    showIcon: true,
+                                    action: { 
+                                        path.append("result")
+                                    }
+                                )
+                            }
+                        }
                     }
                     
                     Spacer()
@@ -204,11 +244,13 @@ struct ContentView: View {
                 case "drawing":
                     DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                 case "result":
-                    ResultView(navigationPath: $path)
+                    ResultView(navigationPath: $path, drawingViewModel: drawingViewModel)
                 case "mainView":
                     ContentView()
                 case "analysis":
                     ImageAnalysisView(navigationPath: $path, viewModel: drawingViewModel)
+                case "detailView":
+                    ResultDetailView(navigationPath: $path, drawingViewModel: drawingViewModel)
                 default:
                     ContentView()
                 }

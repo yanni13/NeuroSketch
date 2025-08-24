@@ -10,6 +10,7 @@ import SwiftUI
 struct ResultDetailView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var navigationPath: NavigationPath
+    @ObservedObject var drawingViewModel: DrawingViewModel
     
     var body: some View {
         ScrollView {
@@ -17,48 +18,49 @@ struct ResultDetailView: View {
 
             VStack {
                 HStack(alignment: .top, spacing: 14) {
-                    EmotionCard(emoji: "😡", emotion: "분노")
+                    if let analysisResult = drawingViewModel.analysisResult {
+                        let koreanEmotion = EmotionUtils.getKoreanEmotion(for: analysisResult.analyzedEmotion.primaryEmotion)
+                        FlexibleEmotionCard(emoji: EmotionUtils.getEmotionEmoji(for: koreanEmotion), emotion: koreanEmotion)
+                    }
                     
-                    StatusIndicatorCard(
-                        statusText: "즉시 관리 필요",
-                        backgroundColor: Color("orange01"),
-                        indicatorColor: Color("orange02")
-                    )
+                    if let analysisResult = drawingViewModel.analysisResult {
+                        let mappedStatusText = getMappedStatusText(for: analysisResult.careStatus.level)
+                        FlexibleStatusIndicatorCard(
+                            statusText: mappedStatusText,
+                            backgroundColor: getStatusBackgroundColor(for: mappedStatusText),
+                            indicatorColor: getStatusIndicatorColor(for: mappedStatusText)
+                        )
+                    }
                 }
-                .padding(.horizontal, 53)
+                .padding(.horizontal, 63)
             }
             
             Spacer().frame(height: 40)
             
             AnalysisSection(icon: "accentIcon", title: "그림 분석") {
                 VStack(alignment: .leading, spacing: 14) {
-                    CategoryHeader(itemName: "집", categoryType: "위치")
-                    
-                    HStack {
-                        AnalysisTag(title: "크기", value: "보통")
-                        AnalysisTag(title: "색상", value: "초록색")
-                        AnalysisTag(title: "크기", value: "보통")
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("🧠")
-                            Text("심리학적 의미")
+                    if let analysisResult = drawingViewModel.analysisResult,
+                       !analysisResult.imageAnalysis.objectDetails.isEmpty {
+                        // 각 객체마다 ObjectAnalysisCard 표시
+                        ForEach(Array(analysisResult.imageAnalysis.objectDetails.enumerated()), id: \.offset) { index, object in
+                            ObjectAnalysisCard(object: object)
+                            
+                            if index < analysisResult.imageAnalysis.objectDetails.count - 1 {
+                                Spacer().frame(height: 20)
+                            }
                         }
-                        
-                        Text("전총적 의미~")
-                    }
-                    .padding(14)
-                    .frame(width: 317, alignment: .topLeading)
-                    .background(.white)
-                    .cornerRadius(14)
+                    } 
                 }
             }
             
             Spacer().frame(height: 24)
             
-            AIConditionsSection(icon: "accentIcon", title: "AI 조건") {
-                Text("ddd")
+            AIConditionsSection(icon: "accentIcon", title: "AI 조언") {
+                if let analysisResult = drawingViewModel.analysisResult {
+                    Text(analysisResult.aiAdvice)
+                } else {
+                    Text("분석 데이터를 불러오는 중입니다...")
+                }
             }
             
             Spacer().frame(height: 40)
@@ -66,11 +68,8 @@ struct ResultDetailView: View {
             RecommendationSection(
                 icon: "accentIcon", 
                 title: "추천 활동",
-                items: [
+                items: drawingViewModel.analysisResult?.recommendedActivities ?? [
                     "규칙적인 운동을 통해 스트레스를 해소하세요",
-                    "충분한 수면을 취하여 정서적 안정을 도모하세요", 
-                    "가족이나 친구와 대화 시간을 늘려보세요",
-                    "취미 활동을 통해 긍정적인 에너지를 충전하세요"
                 ]
             )
             
@@ -80,7 +79,7 @@ struct ResultDetailView: View {
                 icon: "accentIcon",
                 title: "다음 그림 주제 추천",
                 items: [
-                    "평온한 자연 풍경 그리기"
+                    drawingViewModel.analysisResult?.nextDrawingThemeDescription ?? drawingViewModel.nextTopic
                 ]
             )
             
@@ -111,5 +110,123 @@ struct ResultDetailView: View {
                 .frame(width: 44, height: 44)
             }
         }
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func getStatusBackgroundColor(for statusText: String) -> Color {
+        switch statusText {
+        case "즉시 관리 필요":
+            return Color("orange01")
+        case "관리 필요":
+            return Color("yellow02")
+        case "양호":
+            return Color("green04")
+        default:
+            return Color("yellow02")
+        }
+    }
+    
+    private func getStatusIndicatorColor(for statusText: String) -> Color {
+        switch statusText {
+        case "즉시 관리 필요":
+            return Color("orange02")
+        case "관리 필요":
+            return Color("yellow03")
+        case "양호":
+            return Color("green03")
+        default:
+            return Color("yellow03")
+        }
+    }
+    
+    private func getMappedStatusText(for level: String) -> String {
+        switch level.lowercased() {
+        case "긴급", "위험", "즉시_관리", "즉시관리", "urgent", "critical", "high":
+            return "즉시 관리 필요"
+        case "주의", "주의_관찰", "주의관찰", "관리_필요", "관리필요", "medium", "moderate", "attention":
+            return "관리 필요" 
+        case "안정", "양호", "정상", "stable", "good", "normal", "low":
+            return "양호"
+        default:
+            return "관리 필요"
+        }
+    }
+}
+
+// MARK: - Flexible Card Components
+struct FlexibleEmotionCard: View {
+    let emoji: String
+    let emotion: String
+    
+    var body: some View {
+        StatusCard(title: "현재 감정") {
+            HStack {
+                Text(emoji)
+                Text(emotion)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+            }
+        }
+    }
+}
+
+// MARK: FlexibleStatusIndicatorCard
+struct FlexibleStatusIndicatorCard: View {
+    let statusText: String
+    let backgroundColor: Color
+    let indicatorColor: Color
+    
+    private var dynamicMinHeight: CGFloat {
+        switch statusText.count {
+        case 0...4:
+            return 23
+        case 5...8:
+            return 23
+        default:
+            return 23
+        }
+    }
+    
+    private var dynamicPadding: CGFloat {
+        switch statusText.count {
+        case 0...4:
+            return 8
+        case 5...8:
+            return 10
+        default:
+            return 10
+        }
+    }
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("상태")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.primary)
+            
+            HStack(spacing: 6) {
+                Circle()
+                    .frame(width: 8, height: 8)
+                    .foregroundStyle(indicatorColor)
+                
+                Text(statusText)
+//                    .lineLimit(3)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 12, weight: .medium))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.horizontal, dynamicPadding)
+            .padding(.vertical, 4)
+            .frame(maxWidth: .infinity, minHeight: dynamicMinHeight, alignment: .center)
+            .background(backgroundColor)
+            .cornerRadius(dynamicMinHeight / 2)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, minHeight: 88)
+        .overlay(
+            RoundedRectangle(cornerRadius: 0)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        )
     }
 }

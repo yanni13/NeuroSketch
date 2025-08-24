@@ -23,8 +23,7 @@ struct DrawingView: View {
             Spacer().frame(height: 12)
             
             VStack(alignment: .leading, spacing: 3) {
-                Text("나무와 집을 그려보세요")
-                    .lineSpacing(34)
+                Text(viewModel.nextTopic)
                     .font(.headline)
                 
                 Text("그림을 분석해 현재 상태를 알려드릴게요")
@@ -67,6 +66,9 @@ struct DrawingView: View {
         }
         .navigationBarBackButtonHidden()
         .toolbar(.hidden, for: .tabBar)
+        .onAppear {
+            viewModel.fetchNextTopic()
+        }
     }
 
     private func saveDrawingToPhotos() {
