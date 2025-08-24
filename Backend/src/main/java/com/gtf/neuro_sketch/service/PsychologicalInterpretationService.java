@@ -41,6 +41,7 @@ public class PsychologicalInterpretationService {
                         "overallPsychologicalAssessment": "전반적인 심리 상태에 대한 종합적 평가",
                         "artTherapyInsights": [
                             {
+                                "detectedObject": "감지된 객체 (예: 사람, 동물, 사물 등)",
                                 "element": "분석 요소 (예: 색상, 배치, 크기 등)",
                                 "observation": "관찰된 특성",
                                 "psychologicalMeaning": "일반 심리학적 의미",
@@ -56,11 +57,12 @@ public class PsychologicalInterpretationService {
                     
                     미술치료학적 해석 기준:
                     - 색상: 빨간색(열정/분노), 파란색(평온/우울), 노란색(기쁨/불안), 검은색(무력감/보호)
-                    - 배치: 중앙(자아중심), 위쪽(이상/미래), 아래쪽(현실/과거), 모서리(회피/고립)  
+                    - 배치: 중앙(자아중심), 위쪽(이상/미래), 아래쪽(현실/과거), 모서리(회피/고립)
                     - 크기: 큰 그림(자신감/과장), 작은 그림(위축/조심스러움)
                     - 선의 특성: 굵은 선(에너지/공격성), 가는 선(민감성/불안)
                     - 완성도: 완성된 그림(통제감), 미완성(미결정/회피)
                     
+                    detected_object는 그림 분석 결과의 detected_objects 필드와 동일합니다.
                     반드시 ```json ```으로 감싸지 말고 JSON 형식으로 반환하세요.
                     각 해석은 구체적이고 개인화된 내용으로 작성해주세요.
                     """, analysisJson);
@@ -73,6 +75,7 @@ public class PsychologicalInterpretationService {
                         "overallPsychologicalAssessment": "현재 안정적인 심리 상태로 보이며, 자신만의 방식으로 감정을 표현하고 있습니다.",
                         "artTherapyInsights": [
                             {
+                                "detected_object": "집",
                                 "element": "전체적 구성",
                                 "observation": "기본적인 표현 시도",
                                 "psychologicalMeaning": "자기표현에 대한 욕구",
@@ -102,6 +105,7 @@ public class PsychologicalInterpretationService {
     private PsychologicalInterpretation createDefaultInterpretation() {
         List<PsychologicalInterpretationDocument.ArtTherapyInsight> insights = new ArrayList<>();
         insights.add(new PsychologicalInterpretationDocument.ArtTherapyInsight(
+                "집",
                 "전체적 표현",
                 "개인만의 독특한 방식으로 표현",
                 "창작을 통한 자기표현 욕구",

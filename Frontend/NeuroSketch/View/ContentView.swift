@@ -26,9 +26,12 @@ struct ContentView: View {
                     VStack {
                         // 커스텀 헤더
                         HStack {
-                            Text("NeuroSketch")
-                                .font(.title3)
+                            Image("neuroSketchIcon")
+                                .resizable()
+                                .frame(width: 146, height: 34)
+
                             Spacer()
+                            
                             Button(action: {
                                 path.append("drawing")
                             }) {
@@ -51,7 +54,7 @@ struct ContentView: View {
                             Spacer()
                         }
 
-                        Spacer()
+                        Spacer().frame(height: 218)
 
                         LottieComponent()
                             .frame(width: 166, height: 137)
@@ -150,7 +153,7 @@ struct ContentView: View {
                                 .frame(height: 3)
                         }
                     }
-                    .padding(.bottom, 55)
+                    .padding(.bottom, 48)
                 }
             }
             
