@@ -44,6 +44,7 @@ public class PsychologicalInterpretationDocument {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ArtTherapyInsight {
+        private String detectedObject; // detected_object와 동일
         private String element;  // 색상, 형태, 배치 등
         private String observation;  // 관찰된 특성
         private String psychologicalMeaning;  // 심리학적 의미
