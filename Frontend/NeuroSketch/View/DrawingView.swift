@@ -23,12 +23,11 @@ struct DrawingView: View {
             Spacer().frame(height: 12)
             
             VStack(alignment: .leading, spacing: 3) {
-                Text(viewModel.nextTopic)
-                    .font(.system(size: 22, weight: .semibold))
-                    .lineSpacing(34)
+                Text("\(viewModel.nextTopic)을(를) 그려보세요")
+                    .font(.system(size: 18, weight: .semibold))
                 
                 Text("그림을 분석해 현재 상태를 알려드릴게요")
-                    .font(.system(size: 18))
+                    .font(.system(size: 15))
                     .foregroundStyle(.gray01)
                     .lineSpacing(34)
             }

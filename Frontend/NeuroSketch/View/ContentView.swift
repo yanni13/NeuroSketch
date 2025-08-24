@@ -171,28 +171,31 @@ struct ContentView: View {
         .onAppear{
             if ((UserDefaults.standard.string(forKey: "uid")?.isEmpty) != nil) {
                 appState.isLoggedIn = true
+                DrawingAnalysisStorage.shared.printAllAnalysisResults(for: UserDefaults.standard.string(forKey: "uid") ?? "")
             }
         }
     }
     
     private var archiveTapBar: some View{
         NavigationStack(path: $path) {
-            // 커스텀 헤더
             ScrollView{
+                // 커스텀 헤더
                 HStack {
-                    Text("NeuroSketch")
-                        .font(.title3)
+                    Image("neuroSketchIcon")
+                        .resizable()
+                        .frame(width: 146, height: 34)
+
                     Spacer()
+                    
                     Button(action: {
                         path.append("drawing")
                     }) {
                         Image(systemName: "square.and.pencil")
                             .resizable()
-                            .frame(width: 20, height: 20)
+                            .frame(width: 24, height: 24)
                             .foregroundColor(.black)
                             .padding(4)
                     }
-                    .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
                 }
                 .padding(.top, 8)
