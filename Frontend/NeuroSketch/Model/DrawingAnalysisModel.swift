@@ -153,6 +153,7 @@ struct PsychologicalInterpretationModel {
 
 // MARK: - Art Therapy Insight Model
 struct ArtTherapyInsightModel {
+    let detectedObject: String
     let element: String
     let observation: String
     let psychologicalMeaning: String
@@ -322,6 +323,7 @@ extension PsychologicalInterpretationModel {
 
 extension ArtTherapyInsightModel {
     init(from dto: ArtTherapyInsight) {
+        self.detectedObject = dto.detectedObject
         self.element = dto.element
         self.observation = dto.observation
         self.psychologicalMeaning = dto.psychologicalMeaning

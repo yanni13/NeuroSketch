@@ -19,7 +19,7 @@ struct StatusCard: View {
     }
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 4) {
             Text(title)
             content
         }
