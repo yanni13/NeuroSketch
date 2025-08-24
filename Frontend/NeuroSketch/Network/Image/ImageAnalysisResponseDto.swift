@@ -229,6 +229,7 @@ struct PsychologicalInterpretation: Codable {
 
 // MARK: - Art Therapy Insight
 struct ArtTherapyInsight: Codable {
+    let detectedObject: String
     let element: String
     let observation: String
     let psychologicalMeaning: String

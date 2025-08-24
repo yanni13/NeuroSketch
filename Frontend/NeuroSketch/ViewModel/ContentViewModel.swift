@@ -11,6 +11,7 @@ class ContentViewModel: ObservableObject {
     @Published var todoItems: [TodoItemResponseDto] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var todoAction: TodoItemResponseDto? = nil
     
     var pendingTodos: [TodoItemResponseDto] {
         return todoItems.filter { !$0.isDone }

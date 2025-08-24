@@ -13,6 +13,7 @@ struct ResultView: View {
     @State private var isCompleted = false
     @Binding var navigationPath: NavigationPath
     @ObservedObject var drawingViewModel: DrawingViewModel
+    @ObservedObject var contentViewModel: ContentViewModel
     
     var body: some View {
         ZStack {
@@ -64,20 +65,19 @@ struct ResultView: View {
                     if let activities = drawingViewModel.analysisResult?.recommendedActivities,
                        let firstActivity = activities.first {
                         CheckListButton(
-                            text: firstActivity, isCompleted: $isCompleted, showIcon: false
-                        ) {
-                            isCompleted.toggle()
-                            if isCompleted {
-                                showSuccessPopUp = true
-                            }
-                        }
+                            text: firstActivity, isCompleted: .constant(false), showIcon: false
+                        ) {}
                     } else {
-                        CheckListButton(
-                            text: "산책하기", isCompleted: $isCompleted, showIcon: false
-                        ) {
-                            isCompleted.toggle()
-                            if isCompleted {
-                                showSuccessPopUp = true
+                        if let todoAction = contentViewModel.todoAction{
+                            CheckListButton(
+                                text: todoAction.activity, isCompleted: $isCompleted, showIcon: false
+                            ) {
+                                contentViewModel.completeTodo(todoId: todoAction.id) { success in
+                                    if success {
+                                        showSuccessPopUp = true
+                                        isCompleted = true
+                                    }
+                                }
                             }
                         }
                     }
@@ -116,6 +116,11 @@ struct ResultView: View {
                     Image(systemName: "info.circle")
                         .foregroundStyle(.black)
                 })
+            }
+        }
+        .onAppear{
+            if let todoAction = contentViewModel.todoAction{
+                isCompleted = todoAction.done
             }
         }
     }

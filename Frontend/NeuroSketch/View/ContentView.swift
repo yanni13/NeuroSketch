@@ -104,7 +104,7 @@ struct ContentView: View {
                         case "drawing":
                             DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                         case "result":
-                            ResultView(navigationPath: $path, drawingViewModel: drawingViewModel)
+                            ResultView(navigationPath: $path, drawingViewModel: drawingViewModel, contentViewModel: contentViewModel)
                         case "mainView":
                             ContentView()
                         case "analysis":
@@ -207,6 +207,7 @@ struct ContentView: View {
                                     showIcon: true,
                                     action: {
                                         path.append("result")
+                                        contentViewModel.todoAction = todo
                                     }
                                 )
                             }
@@ -224,6 +225,7 @@ struct ContentView: View {
                                     showIcon: true,
                                     action: { 
                                         path.append("result")
+                                        contentViewModel.todoAction = todo
                                     }
                                 )
                             }
@@ -241,7 +243,7 @@ struct ContentView: View {
                 case "drawing":
                     DrawingView(viewModel: drawingViewModel, navigationPath: $path)
                 case "result":
-                    ResultView(navigationPath: $path, drawingViewModel: drawingViewModel)
+                    ResultView(navigationPath: $path, drawingViewModel: drawingViewModel, contentViewModel: contentViewModel)
                 case "mainView":
                     ContentView()
                 case "analysis":

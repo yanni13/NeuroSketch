@@ -43,7 +43,10 @@ struct ResultDetailView: View {
                        !analysisResult.imageAnalysis.objectDetails.isEmpty {
                         // 각 객체마다 ObjectAnalysisCard 표시
                         ForEach(Array(analysisResult.imageAnalysis.objectDetails.enumerated()), id: \.offset) { index, object in
-                            ObjectAnalysisCard(object: object)
+                            ObjectAnalysisCard(
+                                object: object, 
+                                artTherapyInsights: analysisResult.psychologicalInterpretation.artTherapyInsights
+                            )
                             
                             if index < analysisResult.imageAnalysis.objectDetails.count - 1 {
                                 Spacer().frame(height: 20)

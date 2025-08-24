@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ObjectAnalysisCard: View {
     let object: ObjectDetailModel
+    let artTherapyInsights: [ArtTherapyInsightModel]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -26,12 +27,24 @@ struct ObjectAnalysisCard: View {
                     Text("심리학적 의미")
                 }
                 
-                Text(object.symbolicIndicators.artTherapySignificance)
+                Text(getArtTherapyContext())
             }
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .topLeading)
             .background(.white)
             .cornerRadius(14)
+        }
+    }
+    
+    private func getArtTherapyContext() -> String {
+        // artTherapyInsights에서 detectedObject가 object.objectName과 일치하는 항목 찾기
+        if let matchingInsight = artTherapyInsights.first(where: { 
+            $0.detectedObject.lowercased() == object.objectName.lowercased() 
+        }) {
+            return matchingInsight.artTherapyContext
+        } else {
+            // 매칭되는 항목이 없으면 기존 symbolicIndicators 사용
+            return object.symbolicIndicators.artTherapySignificance
         }
     }
 }
